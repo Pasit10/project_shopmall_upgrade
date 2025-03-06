@@ -1,0 +1,40 @@
+USE furniture_shop
+
+CREATE TABLE users (
+    uid CHAR(50) PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    picture LONGBLOB,
+    address TEXT,
+    tel VARCHAR(20),
+    role VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE ProductType (
+	typeid int primary key auto_increment,
+	typename varchar(50)
+)
+
+CREATE TABLE Products (
+    idproduct INT PRIMARY KEY AUTO_INCREMENT,
+    productName VARCHAR(50),
+    pricePerUnit DECIMAL(8,2), -- ราคาขาย
+    costPerUnit DECIMAL(8,2), -- ราคาทุน
+    detail VARCHAR(255),
+    stockQtyFrontEnd INT,
+    stockQtyBackEnd INT,
+    productImage LONGBLOB,
+    typeid int,
+    foreign key (typeid) references ProductType(typeid)
+);
+
+CREATE TABLE Cart(
+    uid CHAR(50) NOT NULL,
+    idproduct INT NOT NULL,
+    quantity INT,
+    isselect CHAR(1),
+    PRIMARY KEY (uid, idproduct),
+    FOREIGN KEY (uid) REFERENCES users(uid),
+    FOREIGN KEY (idproduct) REFERENCES Products(idproduct)
+);
