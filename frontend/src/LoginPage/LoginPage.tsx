@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import axiosInstant from "../utils/axios";
+// import {axios} from 'axios'
 import "bootstrap/dist/css/bootstrap.min.css";
 
 
@@ -13,27 +15,25 @@ const LoginPage = () => {
   const handleEmailLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
-  
+
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
-  
+
     try {
-      const response = await fetch("http://10.42.14.139:3000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        console.log("Login successful", data);
-        localStorage.setItem("role", data.role); 
-        navigate("/home");
+      // const response = await fetch("http://10.42.14.139:3000/login", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ email, password }),
+      // });
+
+      const response = await axiosInstant.post("/login", {email, password}, {withCredentials:true})
+
+      if (response.status === 200) {
+        navigate("/");
       } else {
-        setError(data.message || "Invalid email or password.");
+        setError("Invalid email or password.");
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -43,27 +43,30 @@ const LoginPage = () => {
         setError("An unknown error occurred.");
       }
     }
-  };  
+  };
 
   const handleGoogleLoginSuccess = async (
     credentialResponse: CredentialResponse
   ) => {
     try {
-      const response = await fetch("http://10.42.14.139:3000/auth/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-      });
+      // const response = await fetch("http://10.42.14.139:3000/auth/google", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ token: credentialResponse.credential }),
+      // });
+      const { credential } = credentialResponse
 
-      const data = await response.json();
+      const response = await axiosInstant.post("/google/login", { token: credential }, { withCredentials:true})
 
-      if (response.ok) {
-        console.log("Google Login successful", data);
-        navigate("/home");
+      // const data = await response.json();
+
+      if (response.status === 200) {
+        // console.log("Google Login successful", data);
+        navigate("/");
       } else {
-        setError(data.message || "Google Login failed.");
+        setError(response.data || "Google Login failed.");
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

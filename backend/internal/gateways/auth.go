@@ -27,13 +27,13 @@ func (h HTTPGateway) Login(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
-	token, err := middlewares.GenerateJWT(user.UID, user.Name, user.Role) ///TODO: change role
+	token, err := middlewares.GenerateJWT(user.UID, user.Email, user.Name, user.Role) ///TODO: change role
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 	c.Cookie(&fiber.Cookie{
-		Name:     "jwt",
+		Name:     "jwt-token",
 		Value:    token,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
@@ -56,13 +56,13 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
-	token, err := middlewares.GenerateJWT(req.UID, req.Name, req.Role) ///TODO: change role
+	token, err := middlewares.GenerateJWT(req.UID, req.Email, req.Name, req.Role) ///TODO: change role
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 	c.Cookie(&fiber.Cookie{
-		Name:     "jwt",
+		Name:     "jwt-token",
 		Value:    token,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
@@ -75,7 +75,7 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 func (h HTTPGateway) Logout(c *fiber.Ctx) error {
 	// Clear the JWT cookie
 	c.Cookie(&fiber.Cookie{
-		Name:     "jwt",
+		Name:     "jwt-token",
 		Value:    "",
 		HTTPOnly: true,
 		Expires:  time.Now().Add(-1 * time.Hour), // Expire immediately
@@ -103,13 +103,13 @@ func (h HTTPGateway) RegisterWithGoogle(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
-	token, err := middlewares.GenerateJWT(req.UID, req.Name, req.Role) ///TODO: change role
+	token, err := middlewares.GenerateJWT(req.UID, req.Email, req.Name, req.Role) ///TODO: change role
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 	c.Cookie(&fiber.Cookie{
-		Name:     "jwt",
+		Name:     "jwt-token",
 		Value:    token,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
@@ -127,14 +127,14 @@ func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
-	token, err := middlewares.GenerateJWT(user.UID, user.Name, user.Role) ///TODO: change role
+	token, err := middlewares.GenerateJWT(user.UID, user.Email, user.Name, user.Role) ///TODO: change role
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name:     "jwt",
+		Name:     "jwt-token",
 		Value:    token,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,

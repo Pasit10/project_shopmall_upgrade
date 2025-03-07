@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import validator from "validator";
+import axiosInstant from "../utils/axios";
+import { GoogleLogin , CredentialResponse } from "@react-oauth/google";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -36,28 +38,45 @@ const RegisterPage = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://10.42.14.139:3000/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await axiosInstant.post("/register", {email, password} , {withCredentials:true})
 
-      const data = await response.json();
+      // const data = await response.json();
 
-      if (response.ok) {
-        console.log("Registration successful", data);
+      if (response.status === 201) {
+        // console.log("Registration successful", data);
         navigate("/login");
       } else {
-        setError(data.message || "Registration failed. Please try again.");
+        setError("Registration failed. Please try again.");
       }
     } catch (error) {
       setError("Network error. Please try again later.");
       console.error("Registration error:", error);
+    }
+  };
+
+  const handleGoogleRegistersSuccess = async (
+    credentialResponse: CredentialResponse
+  ) => {
+    try {
+      const { credential } = credentialResponse
+
+      const response = await axiosInstant.post("/google/register", { token: credential }, { withCredentials:true})
+
+      // const data = await response.json();
+
+      if (response.status === 200) {
+        // console.log("Google Login successful", data);
+        navigate("/");
+      } else {
+        setError(response.data || "Google Login failed.");
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+        console.error("Google Login error:", error.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     }
   };
 
@@ -113,6 +132,21 @@ const RegisterPage = () => {
           <button type="submit" className="btn btn-primary w-100">
             Register
           </button>
+          <div className="mt-3 text-center">
+            <GoogleLogin
+              onSuccess={handleGoogleRegistersSuccess}
+              onError={() => setError("Google Login Failed")}
+              />
+          </div>
+          <div className="mt-3 d-flex justify-content-center">
+            <button
+              type="button"
+              className="btn btn-link px-0 text-decoration-none fs-5"
+              onClick={() => navigate("/login")}
+              >
+              Login
+            </button>
+          </div>
         </form>
       </div>
     </div>

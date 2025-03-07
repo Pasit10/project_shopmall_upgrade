@@ -27,18 +27,20 @@ func SetJWTHandler() fiber.Handler {
 
 		claims := token.Claims.(jwt.MapClaims)
 		c.Locals("uid", claims["uid"])
+		c.Locals("email", claims["email"])
 		c.Locals("name", claims["name"])
 		c.Locals("role", claims["role"])
 
 		return c.Next()
 	}
 }
-func GenerateJWT(uid string, name string, role string) (string, error) {
+func GenerateJWT(uid string, email string, name string, role string) (string, error) {
 	claims := jwt.MapClaims{
-		"uid":  uid,
-		"name": name,
-		"role": role,
-		"exp":  time.Now().Add(time.Hour * 12).Unix(),
+		"uid":   uid,
+		"email": email,
+		"name":  name,
+		"role":  role,
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)

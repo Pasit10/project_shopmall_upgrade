@@ -1,11 +1,42 @@
 import { ShoppingCart, Menu, Search } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { User as UserIcon } from "lucide-react";
+import User from '../../src/Type/User'
+import axios from "axios";
+import axiosInstant from '../utils/axios';
 
 const Navbar = () => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axiosInstant.get("/user/me", {withCredentials:true});
+                setUser(response.data); // Store user data
+                console.log("User fetched:", response.data);
+            } catch (error) {
+                console.error("Error fetching user:", error);
+                setUser(null)
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    const Logout = async () => {
+        try {
+            const response = await axios.get("/logout", { withCredentials: true });
+
+            if (response.status === 200) {
+                setUser(null);
+                navigate("/");
+            }
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    };
     return (
         <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
             <div className="container">
@@ -29,19 +60,18 @@ const Navbar = () => {
                             <ShoppingCart size={25} />
                         </button>
 
-                        {!user ? (
-                            <>
-                                <button className="btn btn-outline-dark ms-3" onClick={() => navigate("/login")}>Login</button>
-                            </>
+                        {user == null ? (
+                            <button className="btn btn-outline-dark ms-3" onClick={() => navigate("/login")}>Login</button>
                         ) : (
                             <div className="dropdown ms-3">
                                 <button className="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    {user.name}
+                                    <UserIcon className="w-6 h-6" />
+                                    {user.name} {/* Directly use user.name */}
                                 </button>
                                 <ul className="dropdown-menu">
                                     <li><button className="dropdown-item" onClick={() => navigate("/profile")}>Profile</button></li>
                                     <li><button className="dropdown-item" onClick={() => navigate("/orders")}>Orders</button></li>
-                                    <li><button className="dropdown-item" onClick={() => setUser(null)}>Logout</button></li>
+                                    <li><button className="dropdown-item" onClick={() => Logout()}>Logout</button></li>
                                 </ul>
                             </div>
                         )}

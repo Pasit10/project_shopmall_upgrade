@@ -18,13 +18,10 @@ func InitRoutes(app *fiber.App, gateways HTTPGateway) {
 	google.Post("/login", gateways.LoginWithGoogle)
 	google.Post("/register", gateways.RegisterWithGoogle)
 
-	// Private Routes (Protected by JWT)
-	// private := app.Group("/api", middlewares.SetJWTHandler())
-	// private.Get("/test", testserviceEndpoint.TestService)
-
 	// User
 	users := app.Group("/user", middlewares.SetJWTHandler())
 	users.Get("/", gateways.TestService)
+	users.Get("/me", gateways.GetUser)
 
 	productNojwt := app.Group("/product")
 	productNojwt.Get("/", gateways.GetAllProduct)

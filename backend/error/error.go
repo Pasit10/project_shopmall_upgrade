@@ -138,6 +138,7 @@ var CodesError = map[error]string{
 	MissingOrMalformedToken:  "4012",
 	InvalidOrExpiredToken:    "4013",
 	ProductNotFoundError:     "4040",
+	UsernotfoundError:        "4041",
 	InternalServerError:      "5000",
 	DatabaseConnectedError:   "5001",
 }
