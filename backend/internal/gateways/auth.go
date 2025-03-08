@@ -4,9 +4,11 @@ import (
 	templateError "backend/error"
 	"backend/internal/entities"
 	"backend/middlewares"
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -72,17 +74,51 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User created"})
 }
 
+// Logout function to blacklist JWT
 func (h HTTPGateway) Logout(c *fiber.Ctx) error {
-	// Clear the JWT cookie
+	fmt.Println("tiit")
+	tokenStr := c.Cookies("jwt-token")
+	if tokenStr == "" {
+		httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
+		return c.Status(httpstatuscode).JSON(errorResponse)
+	}
+
+	// Parse the JWT to extract expiration time
+	token, err := middlewares.ParseJWT(tokenStr)
+	if err != nil || !token.Valid {
+		httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.InvalidOrExpiredToken)
+		return c.Status(httpstatuscode).JSON(errorResponse)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["exp"] == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Invalid token structure",
+		})
+	}
+
+	expirationTime := int64(claims["exp"].(float64))
+
+	// Blacklist the token
+	err = middlewares.BlacklistToken(tokenStr, expirationTime)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to blacklist token",
+		})
+	}
+
+	// Remove the JWT from cookies
 	c.Cookie(&fiber.Cookie{
 		Name:     "jwt-token",
 		Value:    "",
+		Expires:  time.Unix(0, 0),
 		HTTPOnly: true,
-		Expires:  time.Now().Add(-1 * time.Hour), // Expire immediately
 	})
-	return c.JSON(fiber.Map{"message": "Logout successful"})
-}
 
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Logged out successfully",
+	})
+}
 func (h HTTPGateway) RegisterWithGoogle(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
 	email := c.Locals("email").(string)

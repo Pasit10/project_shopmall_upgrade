@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { User as UserIcon } from "lucide-react";
 import User from '../../src/Type/User'
-import axios from "axios";
 import axiosInstant from '../utils/axios';
 
 const Navbar = () => {
@@ -14,7 +13,9 @@ const Navbar = () => {
         const fetchUser = async () => {
             try {
                 const response = await axiosInstant.get("/user/me", {withCredentials:true});
-                setUser(response.data); // Store user data
+                if(response.status === 200){
+                    setUser(response.data);
+                }
                 console.log("User fetched:", response.data);
             } catch (error) {
                 console.error("Error fetching user:", error);
@@ -27,9 +28,10 @@ const Navbar = () => {
 
     const Logout = async () => {
         try {
-            const response = await axios.get("/logout", { withCredentials: true });
-
+            const response = await axiosInstant.get("/auth/logout", { withCredentials: true });
+            console.log("rest")
             if (response.status === 200) {
+                console.log("rest3")
                 setUser(null);
                 navigate("/");
             }

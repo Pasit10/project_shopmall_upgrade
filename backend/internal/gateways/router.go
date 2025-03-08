@@ -11,7 +11,8 @@ func InitRoutes(app *fiber.App, gateways HTTPGateway) {
 	// Public Routes
 	app.Post("/login", gateways.Login)
 	app.Post("/register", gateways.Register)
-	app.Get("/logout", gateways.Logout)
+	authJWT := app.Group("/auth", middlewares.SetJWTHandler())
+	authJWT.Get("/logout", gateways.Logout)
 
 	// use Google middleware only login with google
 	google := app.Group("/google", middlewares.SetverifyGoogleTokenMiddleware)
@@ -23,8 +24,12 @@ func InitRoutes(app *fiber.App, gateways HTTPGateway) {
 	users.Get("/", gateways.TestService)
 	users.Get("/me", gateways.GetUser)
 
+	// Product
 	productNojwt := app.Group("/product")
 	productNojwt.Get("/", gateways.GetAllProduct)
 	productNojwt.Get("/type", gateways.GetAllProductType)
 	productNojwt.Get("/type/:type_id", gateways.GetProductByProductTypeID)
+
+	productJWT := app.Group("/product", middlewares.SetJWTHandler())
+	productJWT.Post("/", gateways.CreateProduct)
 }

@@ -23,7 +23,7 @@ type ProductAndType struct {
 	Stockqtyfrontend int32   `json:"stock_qty_frontend"`
 	Stockqtybackend  int32   `json:"stock_qty_backend"`
 	Productimage     string  `json:"product_image"` // ใช้ string แทน BLOB หรือ URL
-	Typeid           string  `json:"typeid"`
+	Typeid           int32   `json:"typeid"`
 	Typename         string  `json:"type_name"`
 }
 
@@ -36,11 +36,12 @@ type Product struct {
 	Stockqtyfrontend int32   `json:"stock_qty_frontend"`
 	Stockqtybackend  int32   `json:"stock_qty_backend"`
 	Productimage     string  `json:"product_image"` // ใช้ string แทน BLOB หรือ URL
-	Typeid           string  `json:"typeid"`
+	Typeid           int32   `json:"typeid"`
 }
 
 // ProductType struct
 type ProductType struct {
 	Typeid   int32  `json:"id"`
 	Typename string `json:"name"`
+	Typeimg  string `json:"type_img"`
 }

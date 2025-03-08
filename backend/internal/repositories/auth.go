@@ -57,12 +57,13 @@ func (repo authRepository) CreateUser(userData entities.UserAuth) (err error) {
 	if repo.DB == nil {
 		return nil
 	}
-	err = repo.DB.Transaction(func(tx *gorm.DB) error {
+	if err := repo.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Table("users").Create(&userData).Error; err != nil {
 			return err
-		} else {
-			return nil
 		}
-	})
+		return nil
+	}); err != nil {
+		return err
+	}
 	return
 }

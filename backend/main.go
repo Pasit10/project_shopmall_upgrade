@@ -33,6 +33,12 @@ func main() {
 
 	// SetUp Database
 	mysql := database.InitDatabaseConnection()
+
+	// setup redis
+	database.InitRedis()
+	defer database.CloseRedis()
+
+	// setup firebasd
 	// config.InitFirebase()
 
 	authRepo := repo.InitAuthRepository(mysql)

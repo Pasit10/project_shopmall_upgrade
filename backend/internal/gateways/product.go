@@ -2,6 +2,7 @@ package gateways
 
 import (
 	templateError "backend/error"
+	"backend/internal/entities"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -42,3 +43,32 @@ func (h HTTPGateway) GetProductByProductTypeID(c *fiber.Ctx) error {
 	}
 	return c.JSON(product)
 }
+
+func (h HTTPGateway) CreateProduct(c *fiber.Ctx) error {
+	// check role
+	if role := c.Locals("role").(string); !(role == "admin" || role == "super admin") {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.UnauthorizedError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	var data entities.Product
+	if err := c.BodyParser(&data); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	err := h.ProductService.CreateProduct(data)
+	if err != nil {
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "suceess"})
+}
+
+// func (h HTTPGateway) UpdateProduct(c *fiber.Ctx) error {
+
+// }
+
+// func (h HTTPGateway) DeleteProduct(c *fiber.Ctx) error {
+
+// }

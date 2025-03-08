@@ -1,3 +1,6 @@
+// import { useState , useEffect } from "react";
+// import axiosInstant from "../utils/axios";
+
 const categories = [
 	{
 		id: 1,
@@ -29,10 +32,25 @@ const categories = [
 	},
 ];
 
-
-
-
 const Categories = () => {
+	// const [categories, setCatagories] = useState([])
+
+	// useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axiosInstant.get("/product/type", {withCredentials:true});
+    //             if(response.status === 200){
+    //                 setCatagories(categories)
+    //             }
+    //             console.log("User fetched:", response.data);
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, []);
+
 	return (<div className="bg-light py-5">
 		<div className="container">
 			<div className="text-center mb-5">
