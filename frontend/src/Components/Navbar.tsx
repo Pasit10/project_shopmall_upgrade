@@ -63,7 +63,19 @@ const Navbar = () => {
                         </button>
 
                         {user == null ? (
-                            <button className="btn btn-outline-dark ms-3" onClick={() => navigate("/login")}>Login</button>
+                            <button
+                            className="btn btn-link-dark d-flex align-items-center justify-content-center"
+                            onClick={() => navigate("/login")}
+                            style={{
+                              outline: "none !important",
+                              boxShadow: "none !important"
+                            }}
+                          >
+                            <UserIcon className="me-1" />
+                            Login
+                          </button>
+                          
+                                                   
                         ) : (
                             <div className="dropdown ms-3">
                                 <button className="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
