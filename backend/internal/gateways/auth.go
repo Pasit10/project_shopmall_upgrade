@@ -28,12 +28,12 @@ func (h HTTPGateway) Login(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
-	access_token, err := middlewares.GenerateAccessJWT(user.UID, user.Email, user.Name, user.Role) ///TODO: change role
+	access_token, err := middlewares.GenerateAccessJWT(user.UID, user.Email, user.Name, user.Role)
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
-	refreshToken, err := middlewares.GenerateRefreshToken(user.UID) // Implement this function
+	refreshToken, err := middlewares.GenerateRefreshToken(user.UID)
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
@@ -60,12 +60,12 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
 
-	access_token, err := middlewares.GenerateAccessJWT(req.UID, req.Email, req.Name, req.Role) ///TODO: change role
+	access_token, err := middlewares.GenerateAccessJWT(req.UID, req.Email, req.Name, req.Role)
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
-	refreshToken, err := middlewares.GenerateRefreshToken(req.UID) // Implement this function
+	refreshToken, err := middlewares.GenerateRefreshToken(req.UID)
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
@@ -206,8 +206,16 @@ func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
 	}
+	refreshToken, err := middlewares.GenerateRefreshToken(user.UID) // Implement this function
+	if err != nil {
+		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
+		return c.Status(httpStatusCode).JSON(errorResponse)
+	}
+
 	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
+	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*24*time.Hour))
 	c.Cookie(cookie)
+	c.Cookie(refreshCookie)
 	return c.JSON(fiber.Map{"message": "refresh successful"})
 }
 

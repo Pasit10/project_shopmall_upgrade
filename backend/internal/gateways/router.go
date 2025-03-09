@@ -13,7 +13,7 @@ func AuthRoutes(app *fiber.App, gateways HTTPGateway) {
 	authJWT := app.Group("/auth", middlewares.SetJWTHandler())
 	authJWT.Get("/logout", gateways.Logout)
 
-	authRefresh := app.Group("/auth", middlewares.SetRefreshJWTHandler())
+	authRefresh := app.Group("/token", middlewares.SetRefreshJWTHandler())
 	authRefresh.Get("/refresh", gateways.GetNewAccessToken)
 
 	// use Google middleware only login with google
