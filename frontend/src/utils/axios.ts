@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const API_HOST = import.meta.env.VITE_API_HOST;
 
@@ -17,26 +17,43 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+
+let isRefreshing = false;
+let refreshPromise: Promise<AxiosResponse> | null = null;
+
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    // if (originalRequest.url === "/auth/callback/google")
-    //   return Promise.reject(error);
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        // ขอ access token ใหม่จาก backend
-        await axiosInstance.get('/token/refresh', { withCredentials: true });
+  async (error: AxiosError) => {
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-        return axiosInstance(originalRequest);
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshPromise = axiosInstance.get("/token/refresh", { withCredentials: true })
+          .then((res) => {
+            isRefreshing = false;
+            refreshPromise = null;
+            return res;
+          })
+          .catch((refreshError) => {
+            isRefreshing = false;
+            refreshPromise = null;
+            window.location.href = "/login"; // Redirect to login if refresh fails
+            return Promise.reject(refreshError);
+          });
+      }
+
+      try {
+        await refreshPromise;
+        return axiosInstance(originalRequest); // Retry the original request
       } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+        return Promise.reject(refreshError); // Reject if refresh fails
       }
     }
-    return Promise.reject(error); // For all other errors, return the error as is.
+
+    return Promise.reject(error);
   }
 );
 

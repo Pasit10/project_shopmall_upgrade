@@ -143,55 +143,6 @@ func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Login successful"})
 }
 
-// Logout function to blacklist JWT
-func (h HTTPGateway) Logout(c *fiber.Ctx) error {
-	tokenStr := c.Cookies("access-token")
-	if tokenStr == "" {
-		httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
-		return c.Status(httpstatuscode).JSON(errorResponse)
-	}
-
-	token, err := middlewares.ParseAccessJWT(tokenStr)
-	if err != nil || !token.Valid {
-		httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.InvalidOrExpiredToken)
-		return c.Status(httpstatuscode).JSON(errorResponse)
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["exp"] == nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Invalid token structure",
-		})
-	}
-
-	expirationTime := int64(claims["exp"].(float64))
-
-	err = middlewares.BlacklistToken(tokenStr, expirationTime)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to blacklist token",
-		})
-	}
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "access-token",
-		Value:    "",
-		Expires:  time.Unix(0, 0),
-		HTTPOnly: true,
-	})
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "refresh-token",
-		Value:    "",
-		Expires:  time.Unix(0, 0),
-		HTTPOnly: true,
-	})
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Logged out successfully",
-	})
-}
-
 func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
 
@@ -219,6 +170,42 @@ func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "refresh successful"})
 }
 
+// Logout function to blacklist JWT
+func (h HTTPGateway) Logout(c *fiber.Ctx) error {
+	accessJWT := c.Cookies("access-token")
+	refreshJWT := c.Cookies("refresh-token")
+	if accessJWT == "" || refreshJWT == "" {
+		httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
+		return c.Status(httpstatuscode).JSON(errorResponse)
+	}
+
+	// ตรวจสอบและเพิ่ม token ลง blacklist
+	if err := validateAndBlacklistToken(accessJWT); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if err := validateAndBlacklistToken(refreshJWT); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "access-token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HTTPOnly: true,
+	})
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh-token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HTTPOnly: true,
+	})
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Logged out successfully",
+	})
+}
+
 func generateCookie(name string, value string, exp time.Time) *fiber.Cookie {
 	cookie := &fiber.Cookie{
 		Name:     name,
@@ -229,4 +216,19 @@ func generateCookie(name string, value string, exp time.Time) *fiber.Cookie {
 		Secure:   false, // Use true if on HTTPS
 	}
 	return cookie
+}
+
+func validateAndBlacklistToken(token string) error {
+	parsedToken, err := middlewares.ParseAccessJWT(token)
+	if err != nil || !parsedToken.Valid {
+		return templateError.MissingOrMalformedToken
+	}
+
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok || claims["exp"] == nil {
+		return templateError.MissingOrMalformedToken
+	}
+
+	expirationTime := int64(claims["exp"].(float64))
+	return middlewares.BlacklistToken(token, expirationTime)
 }

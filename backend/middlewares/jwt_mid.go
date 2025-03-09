@@ -26,7 +26,6 @@ func SetJWTHandler() fiber.Handler {
 			return c.Status(httpstatuscode).JSON(errorResponse)
 		}
 
-		// Check if the token is blacklisted in Redis
 		isBlacklisted, err := IsTokenBlacklisted(accessJWT)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -63,12 +62,22 @@ func SetRefreshJWTHandler() fiber.Handler {
 			return c.Status(httpstatuscode).JSON(errorResponse)
 		}
 
+		isBlacklisted, err := IsTokenBlacklisted(refreshJWT)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Cannot Connect Redis Server Error",
+			})
+		}
+		if isBlacklisted {
+			httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.InvalidOrExpiredToken)
+			return c.Status(httpstatuscode).JSON(errorResponse)
+		}
+
 		token, err := ParseRefreshJWT(refreshJWT)
 		if err != nil || !token.Valid {
 			httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.InvalidOrExpiredToken)
 			return c.Status(httpstatuscode).JSON(errorResponse)
 		}
-
 		claims := token.Claims.(jwt.MapClaims)
 		c.Locals("uid", claims["uid"])
 		return c.Next()
