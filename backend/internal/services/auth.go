@@ -15,6 +15,7 @@ type authService struct {
 }
 
 type IAuthService interface {
+	CheckPermissionAdmin(uid string) error
 	Login(userData entities.UserLogin) (isValid bool, user *entities.UserAuth, err error)
 	Register(userData entities.UserAuth) (err error)
 	RegisterGoogle(userData entities.UserAuth) (err error)
@@ -25,6 +26,19 @@ func InitAuthenService(repo repositories.IAuthRepository) IAuthService {
 	return &authService{
 		AuthRepository: repo,
 	}
+}
+
+func (ser authService) CheckPermissionAdmin(uid string) error {
+	user, err := ser.AuthRepository.GetUserByUID(uid)
+	if err != nil {
+		return err
+	}
+
+	if !(user.Role == "admin" || user.Role == "super admin") {
+		return templateError.UnauthorizedError
+	}
+
+	return nil
 }
 
 func (ser authService) Login(userData entities.UserLogin) (isValid bool, user *entities.UserAuth, err error) {

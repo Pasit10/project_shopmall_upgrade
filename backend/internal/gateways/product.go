@@ -46,8 +46,9 @@ func (h HTTPGateway) GetProductByProductTypeID(c *fiber.Ctx) error {
 
 func (h HTTPGateway) CreateProduct(c *fiber.Ctx) error {
 	// check role
-	if role := c.Locals("role").(string); !(role == "admin" || role == "super admin") {
-		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.UnauthorizedError)
+	uid := c.Locals("uid").(string)
+	if err := h.AuthService.CheckPermissionAdmin(uid); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
 		return c.Status(httpstatuscode).JSON(errorresponse)
 	}
 

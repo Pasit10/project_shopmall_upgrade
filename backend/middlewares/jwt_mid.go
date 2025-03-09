@@ -4,6 +4,7 @@ import (
 	templateError "backend/error"
 	redisdb "backend/pkg/database"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,21 +12,25 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-var jwtSecret = []byte(os.Getenv("SECRET_KEY"))
+var accessSecret = []byte(os.Getenv("ACCESS_SECRET_KEY"))
+var refreshSecret = []byte(os.Getenv("REFRESH_SECRET_KEY"))
 
+// splunk
 func SetJWTHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		tokenStr := c.Cookies("jwt-token")
-		if tokenStr == "" {
+		accessJWT := c.Cookies("access-token")
+		refreshJWT := c.Cookies("refresh-token")
+
+		if accessJWT == "" && refreshJWT == "" {
 			httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
 			return c.Status(httpstatuscode).JSON(errorResponse)
 		}
 
 		// Check if the token is blacklisted in Redis
-		isBlacklisted, err := IsTokenBlacklisted(tokenStr)
+		isBlacklisted, err := IsTokenBlacklisted(accessJWT)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Internal Server Error",
+				"error": "Cannot Connect Redis Server Error",
 			})
 		}
 		if isBlacklisted {
@@ -33,7 +38,7 @@ func SetJWTHandler() fiber.Handler {
 			return c.Status(httpstatuscode).JSON(errorResponse)
 		}
 
-		token, err := ParseJWT(tokenStr)
+		token, err := ParseAccessJWT(accessJWT)
 		if err != nil || !token.Valid {
 			httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.InvalidOrExpiredToken)
 			return c.Status(httpstatuscode).JSON(errorResponse)
@@ -49,22 +54,69 @@ func SetJWTHandler() fiber.Handler {
 	}
 }
 
-func GenerateJWT(uid string, email string, name string, role string) (string, error) {
-	expirationTime := time.Now().Add(time.Hour * 24)
+func SetRefreshJWTHandler() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		refreshJWT := c.Cookies("refresh-token")
+
+		if refreshJWT == "" {
+			httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
+			return c.Status(httpstatuscode).JSON(errorResponse)
+		}
+
+		token, err := ParseRefreshJWT(refreshJWT)
+		if err != nil || !token.Valid {
+			httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.InvalidOrExpiredToken)
+			return c.Status(httpstatuscode).JSON(errorResponse)
+		}
+
+		claims := token.Claims.(jwt.MapClaims)
+		c.Locals("uid", claims["uid"])
+		return c.Next()
+	}
+}
+
+func GenerateAccessJWT(uid string, email string, name string, role string) (string, error) {
+	expirationStr := os.Getenv("EXP_TIME_ACCESS_TOKEN")
+	expirationTime, err := strconv.Atoi(expirationStr)
+	if err != nil {
+		return "", err
+	}
+	exp := time.Now().Add(time.Duration(expirationTime) * time.Second).Unix()
 	claims := jwt.MapClaims{
 		"uid":   uid,
 		"email": email,
 		"name":  name,
 		"role":  role,
-		"exp":   expirationTime.Unix(),
+		"exp":   exp,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(accessSecret)
 }
 
-func ParseJWT(tokenStr string) (*jwt.Token, error) {
+func GenerateRefreshToken(uid string) (string, error) {
+	expirationStr := os.Getenv("EXP_TIME_ACCESS_TOKEN")
+	expirationTime, err := strconv.Atoi(expirationStr)
+	if err != nil {
+		return "", err
+	}
+	exp := time.Now().Add(time.Duration(expirationTime) * time.Second).Unix()
+	claims := jwt.MapClaims{
+		"uid": uid,
+		"exp": exp,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(refreshSecret)
+}
+
+func ParseAccessJWT(tokenStr string) (*jwt.Token, error) {
 	return jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return accessSecret, nil
+	})
+}
+
+func ParseRefreshJWT(tokenStr string) (*jwt.Token, error) {
+	return jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return refreshSecret, nil
 	})
 }
 

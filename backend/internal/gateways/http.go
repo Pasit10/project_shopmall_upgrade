@@ -17,5 +17,7 @@ func InitHTTPGateway(app *fiber.App, auth services.IAuthService, product service
 		ProductService: product,
 	}
 
-	InitRoutes(app, *gateway)
+	AuthRoutes(app, *gateway)
+	UsersRoutes(app, *gateway)
+	ProductRoutes(app, *gateway)
 }
