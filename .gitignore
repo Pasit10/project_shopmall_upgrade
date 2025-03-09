@@ -3,3 +3,10 @@
 
 backend/.env
 backend/authwithfirebase-d23d5-firebase-adminsdk-fbsvc-1b2b588077.json
+
+#sonarqube
+/bin
+/conf
+/.scannerwork
+/jre
+/lib

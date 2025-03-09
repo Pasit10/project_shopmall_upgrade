@@ -3,6 +3,7 @@ import CategoryPage from "./CategoryPage/CategoryPage";
 import HomePage from "./HomePage/HomePage";
 import LoginPage from "./LoginPage/LoginPage";
 import RegisterPage from "./RegisterPage/RegisterPage";
+import AdminPage from "./AdminPage/AdminPage";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Route path="/categories" element={<CategoryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/admin" element={<AdminPage />} />
     </Routes>
   );
 }
