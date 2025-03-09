@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import validator from "validator";
-import axiosInstant from "../utils/axios";
+import axiosInstant from "../../utils/axios";
 import { Lock, Mail, LogIn, UserPlus } from "lucide-react";
 import { GoogleLogin , CredentialResponse } from "@react-oauth/google";
 
