@@ -3,7 +3,7 @@ import CategoryPage from "./CategoryPage/CategoryPage";
 import HomePage from "./HomePage/HomePage";
 import LoginPage from "./LoginPage/LoginPage";
 import RegisterPage from "./RegisterPage/RegisterPage";
-import AdminPage from "./AdminPage/AdminPage";
+import AdminPage from "./Page/AdminPage/AdminPage";
 
 function App() {
   return (

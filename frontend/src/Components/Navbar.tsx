@@ -2,7 +2,7 @@ import { ShoppingCart, Menu, Search } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { User as UserIcon } from "lucide-react";
-import User from '../../src/Type/User'
+import User from '../Types/User'
 import axiosInstant from '../utils/axios';
 
 const Navbar = () => {

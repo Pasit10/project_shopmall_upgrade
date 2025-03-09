@@ -25,7 +25,7 @@ import {
   Legend,
 } from "chart.js";
 import { useNavigate } from "react-router-dom";
-import useStats from "../hook/useStat";
+import useStats from "../../hooks/useStat";
 
 ChartJS.register(
   CategoryScale,

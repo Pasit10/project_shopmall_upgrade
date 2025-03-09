@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axiosInstant from "../utils/axios";
-import Stats from "../Type/Stats"
+import Stats from "../Types/Stats"
 const useStats = () => {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
