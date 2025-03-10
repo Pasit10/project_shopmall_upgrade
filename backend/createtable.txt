@@ -13,7 +13,7 @@ CREATE TABLE users (
 
 CREATE TABLE ProductType (
 	typeid int primary key auto_increment,
-	typename varchar(50)
+	typename varchar(50),
     typeimg LONGBLOB
 )
 
