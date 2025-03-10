@@ -16,7 +16,8 @@ type IProductRepository interface {
 	GetAllProduct() (*[]entities.ProductAndType, error)
 	GetAllProductType() (*[]entities.ProductType, error)
 	GetProductByProductTypeID(typeid int) (*[]entities.Product, error)
-	GetProductByID(product_id int32) (*entities.Product, error)
+	GetProductByID(product_id int) (*entities.Product, error)
+	GetProductTypeByTypeid(typeid int) (*entities.ProductType, error)
 	CreateProduct(product entities.Product) error
 	UpdateProduct(product_id int, product entities.Product) error
 	DeleteProduct(product_id int) error
@@ -64,12 +65,12 @@ func (repo productRepository) GetProductByProductTypeID(typeid int) (*[]entities
 	return &result, nil
 }
 
-func (repo productRepository) GetProductByID(product_id int32) (*entities.Product, error) {
+func (repo productRepository) GetProductByID(product_id int) (*entities.Product, error) {
 	if repo.DB == nil {
 		return nil, templateError.DatabaseConnectedError
 	}
 	var result entities.Product
-	if err := repo.DB.Table("Products").Select("*").Where("idproduct").First(&result).Error; err != nil {
+	if err := repo.DB.Table("Products").Select("*").Where("idproduct = ?", product_id).First(&result).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, templateError.ProductNotFoundError
 		} else {
@@ -77,6 +78,22 @@ func (repo productRepository) GetProductByID(product_id int32) (*entities.Produc
 		}
 	}
 	return &result, nil
+}
+
+func (repo productRepository) GetProductTypeByTypeid(typeid int) (*entities.ProductType, error) {
+	if repo.DB == nil {
+		return nil, templateError.DatabaseConnectedError
+	}
+
+	var ressult entities.ProductType
+	if err := repo.DB.Table("ProductType").Select("*").Where("typeid = ?", typeid).First(&ressult).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, templateError.ProductTypeNotFoundError
+		} else {
+			return nil, err
+		}
+	}
+	return &ressult, nil
 }
 
 func (repo productRepository) CreateProduct(product entities.Product) error {
@@ -102,7 +119,7 @@ func (repo productRepository) UpdateProduct(product_id int, product entities.Pro
 	}
 
 	if err := repo.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table("Products").Where("productid = ?", product_id).Updates(&product).Error; err != nil {
+		if err := tx.Table("Products").Where("idproduct = ?", product_id).Updates(&product).Error; err != nil {
 			return err
 		} else {
 			return nil
@@ -119,7 +136,7 @@ func (repo productRepository) DeleteProduct(product_id int) error {
 	}
 
 	if err := repo.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table("Products").Where("productid = ?", product_id).Delete(&entities.Product{}).Error; err != nil {
+		if err := tx.Table("Products").Where("idproduct= ?", product_id).Delete(&entities.Product{}).Error; err != nil {
 			return err
 		} else {
 			return nil

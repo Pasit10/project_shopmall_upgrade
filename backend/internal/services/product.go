@@ -4,6 +4,7 @@ import (
 	templateError "backend/error"
 	"backend/internal/entities"
 	"backend/internal/repositories"
+	"fmt"
 	"strings"
 )
 
@@ -11,14 +12,16 @@ type productService struct {
 	productRepository repositories.IProductRepository
 }
 
-type IProductRepository interface {
+type IProductService interface {
 	GetAllProduct() (*[]entities.ProductAndType, error)
 	GetAllProductType() (*[]entities.ProductType, error)
 	GetProductByProductTypeID(typeid int) (*[]entities.Product, error)
 	CreateProduct(product entities.Product) error
+	UpdateProduct(product_id int, newproduct entities.Product) error
+	DeleteProduct(product_id int) error
 }
 
-func InitProductService(repo repositories.IProductRepository) IProductRepository {
+func InitProductService(repo repositories.IProductRepository) IProductService {
 	return &productService{
 		productRepository: repo,
 	}
@@ -67,6 +70,53 @@ func (ser productService) CreateProduct(product entities.Product) error {
 	return nil
 }
 
-func (ser productService) DeleteProduct(productid int) error {
+func (ser productService) UpdateProduct(product_id int, newproduct entities.Product) error {
+	if product_id < 0 {
+		return templateError.BadrequestError
+	}
+	_, err := ser.productRepository.GetProductByID(product_id)
+	if err != nil {
+		return err
+	}
+
+	if newproduct.IDproduct < 0 {
+		return templateError.BadrequestError
+	}
+	if strings.TrimSpace(newproduct.Productname) == "" {
+		return templateError.BadrequestError
+	}
+	if newproduct.Priceperunit < 0 {
+		return templateError.BadrequestError
+	}
+	if newproduct.Costperunit < 0 {
+		return templateError.BadrequestError
+	}
+	if newproduct.Typeid < 0 {
+		return templateError.BadrequestError
+	}
+	if _, err := ser.productRepository.GetProductTypeByTypeid(int(newproduct.Typeid)); err != nil {
+		return err
+	}
+
+	if err := ser.productRepository.UpdateProduct(product_id, newproduct); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ser productService) DeleteProduct(product_id int) error {
+	if product_id < 0 {
+		return templateError.BadrequestError
+	}
+
+	_, err := ser.productRepository.GetProductByID(product_id)
+	if err != nil {
+		return err
+	}
+	fmt.Println("test")
+
+	if err := ser.productRepository.DeleteProduct(product_id); err != nil {
+		return err
+	}
 	return nil
 }

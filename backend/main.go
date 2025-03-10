@@ -43,9 +43,11 @@ func main() {
 
 	authRepo := repo.InitAuthRepository(mysql)
 	productRepo := repo.InitProdcutRepository(mysql)
+	// usersRepo := repo.InitUsersRepository(mysql)
 
 	authService := ser.InitAuthenService(authRepo)
 	produteService := ser.InitProductService(productRepo)
+	// usersService := ser.InitUsersService(usersRepo)
 
 	gateways.InitHTTPGateway(app, authService, produteService)
 

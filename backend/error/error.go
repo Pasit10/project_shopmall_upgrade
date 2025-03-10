@@ -113,6 +113,7 @@ var (
 	InvalidOrExpiredToken    TemplateError = New("Invalid_or_expired_token")
 	EmailInvaildFormatError  TemplateError = New("Email_invelid_format")
 	ProductNotFoundError     TemplateError = New("Product_not_found")
+	ProductTypeNotFoundError TemplateError = New("ProductType_not_found")
 )
 
 var HttpStatusCodes = map[error]int{
@@ -127,6 +128,7 @@ var HttpStatusCodes = map[error]int{
 	InvalidOrExpiredToken:    401,
 	EmailInvaildFormatError:  400,
 	ProductNotFoundError:     404,
+	ProductTypeNotFoundError: 404,
 }
 
 var CodesError = map[error]string{
@@ -139,6 +141,7 @@ var CodesError = map[error]string{
 	InvalidOrExpiredToken:    "4013",
 	ProductNotFoundError:     "4040",
 	UsernotfoundError:        "4041",
+	ProductNotFoundError:     "4042",
 	InternalServerError:      "5000",
 	DatabaseConnectedError:   "5001",
 }
@@ -155,6 +158,7 @@ var ThaiDescription = map[error]string{
 	InvalidOrExpiredToken:    "โทเคนไม่ถูกต้องหรือหมดอายุ",
 	EmailInvaildFormatError:  "รูปแบบ email ไม่ถูกต้อง",
 	ProductNotFoundError:     "ไม่พบ product",
+	ProductTypeNotFoundError: "ไม่พบ product type",
 }
 
 var EnglishDescription = map[error]string{
@@ -169,6 +173,7 @@ var EnglishDescription = map[error]string{
 	InvalidOrExpiredToken:    "Invalid or expired token",
 	EmailInvaildFormatError:  "Email invalid format",
 	ProductNotFoundError:     "Product not found",
+	ProductTypeNotFoundError: "Product type not found",
 }
 
 func GetErrorResponse(err error) (int, HttpErrorResponse) {

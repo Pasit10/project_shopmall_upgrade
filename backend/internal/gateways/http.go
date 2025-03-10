@@ -8,10 +8,10 @@ import (
 
 type HTTPGateway struct {
 	AuthService    services.IAuthService
-	ProductService services.IProductRepository
+	ProductService services.IProductService
 }
 
-func InitHTTPGateway(app *fiber.App, auth services.IAuthService, product services.IProductRepository) {
+func InitHTTPGateway(app *fiber.App, auth services.IAuthService, product services.IProductService) {
 	gateway := &HTTPGateway{
 		AuthService:    auth,
 		ProductService: product,
