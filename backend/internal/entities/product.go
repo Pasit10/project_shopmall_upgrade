@@ -45,3 +45,8 @@ type ProductType struct {
 	Typename string `json:"name"`
 	Typeimg  string `json:"type_img"`
 }
+
+type ProductWithFilter struct {
+	Maxprice float64   `json:"max_price"`
+	Product  []Product `json:"product"`
+}

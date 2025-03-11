@@ -33,6 +33,7 @@ func main() {
 
 	// SetUp Database
 	mysql := database.InitDatabaseConnection()
+	// postgres := database.InitPostgresDatabaseConnection()
 
 	// setup redis
 	database.InitRedis()
@@ -57,4 +58,8 @@ func main() {
 	}
 
 	app.Listen(":" + PORT)
+	// err = app.ListenTLS(":443", "server.crt", "server.key")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 }

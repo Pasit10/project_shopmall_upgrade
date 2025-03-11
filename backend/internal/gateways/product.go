@@ -3,6 +3,7 @@ package gateways
 import (
 	templateError "backend/error"
 	"backend/internal/entities"
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -41,6 +42,41 @@ func (h HTTPGateway) GetProductByProductTypeID(c *fiber.Ctx) error {
 		return c.Status(httpStatusCode).JSON(errorresponse)
 	}
 	return c.JSON(product)
+}
+
+func (h HTTPGateway) GetProductFilter(c *fiber.Ctx) error {
+	// (typeid int, minprice float64, maxprice float64)
+	typeid_str := c.Query("typeid")
+	minprice_str := c.Query("minprice")
+	maxprice_str := c.Query("maxprice")
+
+	typeid, err := strconv.Atoi(typeid_str)
+	if err != nil {
+		fmt.Println("1")
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+
+	minprice, err := strconv.ParseFloat(minprice_str, 64)
+	if err != nil {
+		fmt.Println("2")
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+
+	maxprice, err := strconv.ParseFloat(maxprice_str, 64)
+	if err != nil {
+		fmt.Println("3")
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+
+	productfilter, err := h.ProductService.GetProductFilter(typeid, minprice, maxprice)
+	if err != nil {
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+	return c.JSON(productfilter)
 }
 
 func (h HTTPGateway) CreateProduct(c *fiber.Ctx) error {

@@ -19,6 +19,7 @@ type IProductService interface {
 	CreateProduct(product entities.Product) error
 	UpdateProduct(product_id int, newproduct entities.Product) error
 	DeleteProduct(product_id int) error
+	GetProductFilter(typeid int, minprice float64, maxprice float64) (*entities.ProductWithFilter, error)
 }
 
 func InitProductService(repo repositories.IProductRepository) IProductService {
@@ -119,4 +120,19 @@ func (ser productService) DeleteProduct(product_id int) error {
 		return err
 	}
 	return nil
+}
+
+func (ser productService) GetProductFilter(typeid int, minprice float64, maxprice float64) (*entities.ProductWithFilter, error) {
+	if typeid < 0 || minprice < 0 || maxprice < 0 {
+		return nil, templateError.BadrequestError
+	}
+	if minprice > maxprice {
+		return nil, templateError.BadrequestError
+	}
+
+	productfilter, err := ser.productRepository.GetProductFilter(typeid, minprice, maxprice)
+	if err != nil {
+		return nil, err
+	}
+	return productfilter, nil
 }

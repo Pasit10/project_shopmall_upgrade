@@ -36,6 +36,7 @@ func ProductRoutes(app *fiber.App, gateways HTTPGateway) {
 	productNojwt.Get("/", gateways.GetAllProduct)
 	productNojwt.Get("/type", gateways.GetAllProductType)
 	productNojwt.Get("/type/:type_id", gateways.GetProductByProductTypeID)
+	productNojwt.Get("filter", gateways.GetProductFilter)
 
 	productJWT := app.Group("/product", middlewares.SetJWTHandler())
 	productJWT.Post("/", gateways.CreateProduct)
