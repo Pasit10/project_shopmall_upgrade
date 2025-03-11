@@ -6,6 +6,7 @@ import RegisterPage from "./Page/RegisterPage/RegisterPage";
 import AdminPage from "./Page/AdminPage/AdminPage";
 import AdminProductPage from "./Page/ProductAdminPage/ProductAdminPage";
 import OrdersAdminPage from "./Page/OrdersAdminPage/OrdersAdminPage";
+import ProductPage from "./Page/ProductPage/ProductPage";
 
 
 function App() {
@@ -15,9 +16,11 @@ function App() {
       <Route path="/categories" element={<CategoryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/shop" element={<ProductPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/product" element={<AdminProductPage/>} />
       <Route path="/admin/orders" element={<OrdersAdminPage/>} />
+      
     </Routes>
   );
 }

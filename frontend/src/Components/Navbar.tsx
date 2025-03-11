@@ -40,8 +40,8 @@ const Navbar = () => {
         }
     };
     return (
-        <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
-            <div className="container">
+        <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top w-100 px-5">
+
                 <a className="navbar-brand fw-bold fs-4" href="#">LUXE</a>
                 <button className="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <Menu size={24} />
@@ -91,7 +91,6 @@ const Navbar = () => {
                         )}
                     </div>
                 </div>
-            </div>
         </nav>
     );
 };
