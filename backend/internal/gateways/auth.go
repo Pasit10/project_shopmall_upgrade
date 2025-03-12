@@ -40,7 +40,7 @@ func (h HTTPGateway) Login(c *fiber.Ctx) error {
 	}
 
 	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
-	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*24*time.Hour))
+	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
 
@@ -72,7 +72,7 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 	}
 
 	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
-	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*24*time.Hour))
+	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
 
@@ -111,7 +111,7 @@ func (h HTTPGateway) RegisterWithGoogle(c *fiber.Ctx) error {
 	}
 
 	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
-	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*24*time.Hour))
+	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User created"})
@@ -137,7 +137,7 @@ func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
 	}
 
 	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
-	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*24*time.Hour))
+	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
 	return c.JSON(fiber.Map{"message": "Login successful"})
@@ -164,7 +164,7 @@ func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
 	}
 
 	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
-	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*24*time.Hour))
+	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
 	return c.JSON(fiber.Map{"message": "refresh successful"})

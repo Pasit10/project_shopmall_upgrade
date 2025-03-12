@@ -1,17 +1,13 @@
 package gateways
 
 import (
-	"fmt"
+	templateError "backend/error"
+	"backend/internal/entities"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func (h HTTPGateway) TestService(c *fiber.Ctx) error {
-	user := c.Locals("name")
-	res := fmt.Sprintf("Hello! %s", user)
-	return c.JSON(fiber.Map{"message": res})
-}
-
+// ยังไม่แก้
 func (h HTTPGateway) GetUser(c *fiber.Ctx) error {
 	email := c.Locals("email")
 	name := c.Locals("name")
@@ -21,4 +17,20 @@ func (h HTTPGateway) GetUser(c *fiber.Ctx) error {
 		"name":  name,
 		"role":  role,
 	})
+}
+
+func (h HTTPGateway) InsertCart(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	var data entities.InsertCart
+	if err := c.BodyParser(&data); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	if err := h.UserService.InsertCart(uid, data); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.JSON(fiber.Map{"message": "success"})
 }

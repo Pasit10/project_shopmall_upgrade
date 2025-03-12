@@ -1,4 +1,12 @@
 services:
+  # frontend:
+
+  # backend:
+
+  # database:
+
+  # redis:
+
   sonarqube:
     image: sonarqube:community
     hostname: sonarqube

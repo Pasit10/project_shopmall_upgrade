@@ -44,13 +44,14 @@ func main() {
 
 	authRepo := repo.InitAuthRepository(mysql)
 	productRepo := repo.InitProdcutRepository(mysql)
-	// usersRepo := repo.InitUsersRepository(mysql)
+	usersRepo := repo.InitUsersRepository(mysql)
+	cartRepo := repo.InitCartRepository(mysql)
 
 	authService := ser.InitAuthenService(authRepo)
 	produteService := ser.InitProductService(productRepo)
-	// usersService := ser.InitUsersService(usersRepo)
+	usersService := ser.InitUsersService(usersRepo, productRepo, cartRepo)
 
-	gateways.InitHTTPGateway(app, authService, produteService)
+	gateways.InitHTTPGateway(app, authService, produteService, usersService)
 
 	PORT := os.Getenv("SERVER_PORT")
 	if PORT == "" {
