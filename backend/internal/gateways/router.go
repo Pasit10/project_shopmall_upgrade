@@ -26,8 +26,8 @@ func AuthRoutes(app *fiber.App, gateways HTTPGateway) {
 func UsersRoutes(app *fiber.App, gateways HTTPGateway) {
 	// User
 	users := app.Group("/user", middlewares.SetJWTHandler())
-	users.Get("/", gateways.TestService)
 	users.Get("/me", gateways.GetUser)
+	users.Post("/cart", gateways.InsertCart)
 }
 
 func ProductRoutes(app *fiber.App, gateways HTTPGateway) {

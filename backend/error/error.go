@@ -114,6 +114,7 @@ var (
 	EmailInvaildFormatError  TemplateError = New("Email_invelid_format")
 	ProductNotFoundError     TemplateError = New("Product_not_found")
 	ProductTypeNotFoundError TemplateError = New("ProductType_not_found")
+	CartNotFoundError        TemplateError = New("Cart_not_found")
 )
 
 var HttpStatusCodes = map[error]int{
@@ -129,6 +130,7 @@ var HttpStatusCodes = map[error]int{
 	EmailInvaildFormatError:  400,
 	ProductNotFoundError:     404,
 	ProductTypeNotFoundError: 404,
+	CartNotFoundError:        404,
 }
 
 var CodesError = map[error]string{
@@ -142,6 +144,7 @@ var CodesError = map[error]string{
 	ProductNotFoundError:     "4040",
 	UsernotfoundError:        "4041",
 	ProductNotFoundError:     "4042",
+	CartNotFoundError:        "4043",
 	InternalServerError:      "5000",
 	DatabaseConnectedError:   "5001",
 }
@@ -159,6 +162,7 @@ var ThaiDescription = map[error]string{
 	EmailInvaildFormatError:  "รูปแบบ email ไม่ถูกต้อง",
 	ProductNotFoundError:     "ไม่พบ product",
 	ProductTypeNotFoundError: "ไม่พบ product type",
+	CartNotFoundError:        "ไม่พบ cart",
 }
 
 var EnglishDescription = map[error]string{
@@ -174,6 +178,7 @@ var EnglishDescription = map[error]string{
 	EmailInvaildFormatError:  "Email invalid format",
 	ProductNotFoundError:     "Product not found",
 	ProductTypeNotFoundError: "Product type not found",
+	CartNotFoundError:        "Cart not found",
 }
 
 func GetErrorResponse(err error) (int, HttpErrorResponse) {
