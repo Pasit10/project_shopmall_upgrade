@@ -19,6 +19,7 @@ type IAuthService interface {
 	Login(userData entities.UserLogin) (isValid bool, user *entities.UserAuth, err error)
 	Register(userData entities.UserAuth) (err error)
 	RegisterGoogle(userData entities.UserAuth) (err error)
+	LoginWithGoogle(uid string, userData entities.UserAuth) (user *entities.UserAuth, err error)
 	GetUserByUID(uid string) (user *entities.UserAuth, err error)
 }
 
@@ -121,6 +122,21 @@ func (ser authService) RegisterGoogle(userData entities.UserAuth) (err error) {
 	if err != nil {
 		fmt.Println(err)
 		return err
+	}
+	return
+}
+
+func (ser authService) LoginWithGoogle(uid string, userData entities.UserAuth) (user *entities.UserAuth, err error) {
+	user, err = ser.AuthRepository.GetUserByUID(uid)
+	if err != nil {
+		if errors.Is(err, templateError.UsernotfoundError) {
+			if err = ser.AuthRepository.CreateUser(userData); err != nil {
+				return nil, err
+			}
+			return &userData, nil
+		} else {
+			return nil, err
+		}
 	}
 	return
 }

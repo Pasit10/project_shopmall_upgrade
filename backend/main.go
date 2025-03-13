@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/configuration"
 	"backend/internal/gateways"
 	repo "backend/internal/repositories"
 	ser "backend/internal/services"
@@ -9,6 +10,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
@@ -21,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	app := fiber.New()
+	app := fiber.New(configuration.NewConfiguraiton())
 	app.Use(middlewares.NewLogger())
 	// app.Use(cors.New())
 	app.Use(cors.New(cors.Config{
@@ -29,6 +31,11 @@ func main() {
 		AllowCredentials: true,
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowHeaders:     "Content-Type, Authorization",
+	}))
+	app.Use(swagger.New(swagger.Config{
+		BasePath: "/",
+		FilePath: "./docs/swagger.yaml",
+		Path:     "docs",
 	}))
 
 	// SetUp Database
