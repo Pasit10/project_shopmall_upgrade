@@ -119,7 +119,19 @@ func (h HTTPGateway) RegisterWithGoogle(c *fiber.Ctx) error {
 
 func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
-	user, err := h.AuthService.GetUserByUID(uid)
+	email := c.Locals("email").(string)
+	name := c.Locals("name").(string)
+	picture := c.Locals("picture").(string)
+
+	var req = entities.UserAuth{
+		UID:     uid,
+		Email:   email,
+		Name:    name,
+		Picture: picture,
+		Role:    "user",
+	}
+
+	user, err := h.AuthService.LoginWithGoogle(uid, req)
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
 		return c.Status(httpStatusCode).JSON(errorResponse)
@@ -145,19 +157,8 @@ func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
 
 func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
-	email := c.Locals("email").(string)
-	name := c.Locals("name").(string)
-	picture := c.Locals("picture").(string)
 
-	var req = entities.UserAuth{
-		UID:     uid,
-		Email:   email,
-		Name:    name,
-		Picture: picture,
-		Role:    "user",
-	}
-
-	user, err := h.AuthService.LoginWithGoogle(uid, req)
+	user, err := h.AuthService.GetUserByUID(uid)
 	if err != nil {
 		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
 		return c.Status(httpstatuscode).JSON(errorresponse)
