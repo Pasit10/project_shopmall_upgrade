@@ -16,17 +16,29 @@ const LoginPage = () => {
   const handleEmailLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
-
+  
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
-
+  
     try {
-      const response = await axiosInstant.post("/login", {email, password}, {withCredentials:true})
-
+      const response = await axiosInstant.post(
+        "/login",
+        { email, password },
+        { withCredentials: true }
+      );
+  
       if (response.status === 200) {
-        navigate("/");
+        const { role } = response.data; // ดึง role จาก response
+        console.log("",role);
+        if (role === "admin") {
+          navigate("/homeadmin");
+        } else if (role === "user") {
+          navigate("/");
+        } else {
+          setError("Invalid user role.");
+        }
       } else {
         setError("Invalid email or password.");
       }
@@ -39,6 +51,7 @@ const LoginPage = () => {
       }
     }
   };
+  
 
   const handleGoogleLoginSuccess = async (
     credentialResponse: CredentialResponse

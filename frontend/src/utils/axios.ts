@@ -4,7 +4,6 @@ const API_HOST = import.meta.env.VITE_API_HOST;
 
 const axiosInstance = axios.create({
   baseURL: API_HOST,
-  timeout: 1000,
   withCredentials: true,
 });
 

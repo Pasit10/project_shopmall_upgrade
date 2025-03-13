@@ -7,6 +7,7 @@ import AdminPage from "./Page/AdminPage/AdminPage";
 import AdminProductPage from "./Page/ProductAdminPage/ProductAdminPage";
 import OrdersAdminPage from "./Page/OrdersAdminPage/OrdersAdminPage";
 import ProductPage from "./Page/ProductPage/ProductPage";
+import AdminHomePage from "./Page/AdminHomePage/AdminHomePage";
 
 
 function App() {
@@ -18,8 +19,10 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/shop" element={<ProductPage />} />
       <Route path="/admin" element={<AdminPage />} />
+      <Route path="/homeadmin" element={<AdminHomePage/>} />
       <Route path="/admin/product" element={<AdminProductPage/>} />
       <Route path="/admin/orders" element={<OrdersAdminPage/>} />
+      
     </Routes>
   );
 }
