@@ -11,6 +11,6 @@ func NewConfiguraiton() fiber.Config {
 		AppName:     "Furniture Shop",
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
-		Prefork:     true,
+		// Prefork:     true,
 	}
 }
