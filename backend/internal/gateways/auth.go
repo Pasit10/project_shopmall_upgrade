@@ -44,7 +44,7 @@ func (h HTTPGateway) Login(c *fiber.Ctx) error {
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
 
-	return c.JSON(fiber.Map{"message": "Login successful"})
+	return c.JSON(fiber.Map{"message": "Login successful", "role": user.Role})
 }
 
 func (h HTTPGateway) Register(c *fiber.Ctx) error {
@@ -140,7 +140,7 @@ func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
 	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
 	c.Cookie(cookie)
 	c.Cookie(refreshCookie)
-	return c.JSON(fiber.Map{"message": "Login successful"})
+	return c.JSON(fiber.Map{"message": "Login successful", "role": user.Role})
 }
 
 func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
