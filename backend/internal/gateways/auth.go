@@ -185,10 +185,6 @@ func (h HTTPGateway) GetNewAccessToken(c *fiber.Ctx) error {
 func (h HTTPGateway) Logout(c *fiber.Ctx) error {
 	accessJWT := c.Cookies("access-token")
 	refreshJWT := c.Cookies("refresh-token")
-	if accessJWT == "" || refreshJWT == "" {
-		httpstatuscode, errorResponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
-		return c.Status(httpstatuscode).JSON(errorResponse)
-	}
 
 	// ตรวจสอบและเพิ่ม token ลง blacklist
 	if err := validateAndBlacklistToken(accessJWT); err != nil {
