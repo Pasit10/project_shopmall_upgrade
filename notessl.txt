@@ -1,0 +1,23 @@
+# สร้าง private key
+openssl genpkey -algorithm RSA -out server.key
+
+คำสั่งนี้ใช้ สร้างกุญแจส่วนตัว (Private Key) โดยใช้ อัลกอริธึม RSA
+ไฟล์ที่ได้: server.key ซึ่งเป็นไฟล์กุญแจส่วนตัวที่ใช้ในการเข้ารหัสและสร้างใบรับรอง
+
+# สร้าง Certificate Signing Request (CSR)
+openssl req -new -key server.key -out server.csr
+
+ใช้ สร้างคำขอใบรับรอง (CSR - Certificate Signing Request)
+-new หมายถึงสร้างคำขอใหม่
+-key server.key ใช้กุญแจส่วนตัว (server.key) ที่สร้างไว้เพื่อเซ็นคำขอ
+ไฟล์ที่ได้: server.csr ซึ่งเป็นคำขอใบรับรองที่สามารถนำไปขอใบรับรองจาก Certificate Authority (CA) หรือใช้ self-sign ได้
+
+# สร้าง self-signed certificate (valid 365 days)
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+ใช้ ออกใบรับรองด้วยตัวเอง (Self-Signed Certificate) โดยใช้ CSR ที่สร้างไว้
+-x509 ระบุให้สร้างใบรับรอง X.509 | X.509 เป็นมาตรฐานสำหรับ โครงสร้างของใบรับรองดิจิทัล (Digital Certificate) ที่ใช้ในระบบ Public Key Infrastructure (PKI)
+-req ระบุว่าใช้ CSR (server.csr)
+-days 365 ระบุอายุของใบรับรองให้ใช้ได้ 365 วัน
+-signkey server.key ใช้กุญแจส่วนตัว (server.key) ลงนามในใบรับรอง
+ไฟล์ที่ได้: server.crt ซึ่งเป็น ใบรับรองดิจิทัล ที่สามารถใช้เข้ารหัสข้อมูลในการสื่อสารแบบ TLS/SSL
