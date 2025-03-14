@@ -15,6 +15,7 @@ type usersService struct {
 type IUserService interface {
 	GetuserData(uid string) (*entities.UserData, error)
 	InsertCart(uid string, cart_data entities.InsertCart) error
+	GetCartByUID(uid string) (*[]entities.CartResponse, error)
 }
 
 func InitUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IProductRepository, repo2 repositories.ICartRepository) IUserService {
@@ -68,4 +69,17 @@ func (ser usersService) InsertCart(uid string, cart_data entities.InsertCart) er
 		}
 	}
 	return nil
+}
+
+func (ser usersService) GetCartByUID(uid string) (*[]entities.CartResponse, error) {
+	_, err := ser.usersRepository.GetUserData(uid)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ser.cartRepository.GetCartByUID(uid)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }

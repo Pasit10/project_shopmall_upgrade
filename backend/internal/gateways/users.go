@@ -34,3 +34,14 @@ func (h HTTPGateway) InsertCart(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"message": "success"})
 }
+
+func (h HTTPGateway) GetCartByUID(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	cart, err := h.UserService.GetCartByUID(uid)
+	if err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.JSON(cart)
+}

@@ -13,7 +13,7 @@ type cartRepository struct {
 }
 
 type ICartRepository interface {
-	GetCartByUID(uid string) (*[]entities.Cart, error)
+	GetCartByUID(uid string) (*[]entities.CartResponse, error)
 	CreateCart(cartdata entities.Cart) error
 	FindCart(uid string, idproduct int) (*entities.Cart, error)
 	UpdateCart(uid string, idproduct int32, cartdata entities.Cart) error
@@ -25,13 +25,15 @@ func InitCartRepository(db *gorm.DB) ICartRepository {
 	}
 }
 
-func (repo cartRepository) GetCartByUID(uid string) (*[]entities.Cart, error) {
+func (repo cartRepository) GetCartByUID(uid string) (*[]entities.CartResponse, error) {
 	if repo.DB == nil {
 		return nil, templateError.DatabaseConnectedError
 	}
 
-	var result []entities.Cart
-	if err := repo.DB.Table("cart").Select("*").Where("uid = ?", uid).Find(&result).Error; err != nil {
+	var result []entities.CartResponse
+	if err := repo.DB.Table("cart").Select("cart.idproduct,productname,priceperunit,quantity").
+		Joins("INNER JOIN Products ON Products.idproduct = cart.idproduct").
+		Where("uid = ?", uid).Find(&result).Error; err != nil {
 		return nil, err
 	}
 	return &result, nil
