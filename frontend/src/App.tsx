@@ -22,7 +22,6 @@ function App() {
       <Route path="/homeadmin" element={<AdminHomePage/>} />
       <Route path="/admin/product" element={<AdminProductPage/>} />
       <Route path="/admin/orders" element={<OrdersAdminPage/>} />
-      
     </Routes>
   );
 }
