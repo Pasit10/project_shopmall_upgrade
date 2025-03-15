@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
@@ -32,11 +31,11 @@ func main() {
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowHeaders:     "Content-Type, Authorization",
 	}))
-	app.Use(swagger.New(swagger.Config{
-		BasePath: "/",
-		FilePath: "./docs/swagger.yaml",
-		Path:     "docs",
-	}))
+	// app.Use(swagger.New(swagger.Config{
+	// 	BasePath: "/",
+	// 	FilePath: "./docs/swagger.yaml",
+	// 	Path:     "docs",
+	// }))
 
 	// SetUp Database
 	mysql := database.InitDatabaseConnection()
@@ -45,9 +44,6 @@ func main() {
 	// setup redis
 	database.InitRedis()
 	defer database.CloseRedis()
-
-	// setup firebasd
-	// config.InitFirebase()
 
 	authRepo := repo.InitAuthRepository(mysql)
 	productRepo := repo.InitProdcutRepository(mysql)
