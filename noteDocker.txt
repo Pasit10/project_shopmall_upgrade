@@ -1,0 +1,26 @@
+-- Docker network --
+docker network create my_network
+
+-- Docker build Backend --
+docker build --platform linux/amd64 -t sample-app-go:1.0.0 -t backend:latest -f ./Dockerfile.multistage .
+
+-- Docker run Backend ---
+docker run -d --name backend --network my_network -p 3000:3000 backend
+
+
+-- Docker build Frontend --
+docker build -t frontend .
+-- Docker run Frontend --
+docker run -d --name frontend --network my_network -p 8080:80 frontend
+
+
+# Start the frontend container
+docker run -d --name frontend --network my_network -p 8080:80 frontend
+
+# Start the backend container
+docker run -d --name backend --network my_network -p 3000:3000 backend
+
+
+ project
+    /backend
+    /frontend
