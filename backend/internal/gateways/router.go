@@ -19,8 +19,7 @@ func AuthRoutes(app *fiber.App, gateways HTTPGateway) {
 
 	// use Google middleware only login with google
 	google := app.Group("/google", middlewares.SetverifyGoogleTokenMiddleware)
-	google.Post("/login", gateways.LoginWithGoogle)
-	google.Post("/register", gateways.RegisterWithGoogle)
+	google.Post("/login", gateways.LoginWithGoogle) // login and register
 }
 
 func UsersRoutes(app *fiber.App, gateways HTTPGateway) {

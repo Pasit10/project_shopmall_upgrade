@@ -18,7 +18,6 @@ type IAuthService interface {
 	CheckPermissionAdmin(uid string) error
 	Login(userData entities.UserLogin) (isValid bool, user *entities.UserAuth, err error)
 	Register(userData entities.UserAuth) (err error)
-	RegisterGoogle(userData entities.UserAuth) (err error)
 	LoginWithGoogle(uid string, userData entities.UserAuth) (user *entities.UserAuth, err error)
 	GetUserByUID(uid string) (user *entities.UserAuth, err error)
 }
@@ -106,30 +105,11 @@ func (ser authService) Register(userData entities.UserAuth) (err error) {
 	return
 }
 
-func (ser authService) RegisterGoogle(userData entities.UserAuth) (err error) {
-	if userData.Email == "" {
-		return templateError.BadrequestError
-	}
-	if _, err := mail.ParseAddress(userData.Email); err != nil {
-		return templateError.EmailInvaildFormatError
-	}
-	_, err = ser.AuthRepository.GetUser(userData.Email)
-	if !errors.Is(err, templateError.UsernotfoundError) {
-		return templateError.EmailAlreadyExistError
-	}
-
-	err = ser.AuthRepository.CreateUser(userData)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	return
-}
-
 func (ser authService) LoginWithGoogle(uid string, userData entities.UserAuth) (user *entities.UserAuth, err error) {
 	user, err = ser.AuthRepository.GetUserByUID(uid)
 	if err != nil {
 		if errors.Is(err, templateError.UsernotfoundError) {
+			userData.Logintype = "Google"
 			if err = ser.AuthRepository.CreateUser(userData); err != nil {
 				return nil, err
 			}

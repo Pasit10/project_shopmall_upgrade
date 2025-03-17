@@ -37,8 +37,8 @@ func (repo productRepository) GetAllProduct() (*[]entities.ProductAndType, error
 	}
 	var result []entities.ProductAndType
 	if err := repo.DB.Table("products").
-		Select("idproduct", "productname", "priceperunit", "costperunit", "detail", "stockqtyfrontend", "stockqtybackend", "productimage", "Products.typeid", "typename").
-		Joins("INNER JOIN ProductType ON ProductType.typeid = Products.typeid").
+		Select("idproduct", "productname", "priceperunit", "costperunit", "detail", "stockqtyfrontend", "stockqtybackend", "productimage", "products.typeid", "typename").
+		Joins("INNER JOIN producttype ON producttype.typeid = products.typeid").
 		Find(&result).Error; err != nil {
 		return nil, err
 	}

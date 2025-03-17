@@ -61,7 +61,7 @@ const RegisterPage = () => {
     try {
       const { credential } = credentialResponse
 
-      const response = await axiosInstant.post("/google/register", { token: credential }, { withCredentials:true})
+      const response = await axiosInstant.post("/google/login", { token: credential }, { withCredentials:true})
 
       // const data = await response.json();
 
