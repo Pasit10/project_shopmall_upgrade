@@ -1,20 +1,14 @@
 # Build stage (Node.js)
 FROM node:lts AS builder
 WORKDIR /app
-# Copy package.json and other necessary files before installing dependencies
-COPY ./package.json .
-COPY ./package-lock.json .
-COPY ./tsconfig.json .
+COPY ./package.json ./package-lock.json ./tsconfig.json ./
 RUN npm install
-# Copy the rest of the application files
 COPY . .
 RUN npm run build
 
 # Final stage (NGINX)
 FROM nginx:alpine AS final
-# Copy NGINX configuration to container
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-# Copy build files from build stage to the directory that NGINX will serve
+COPY ./nginx_frontend.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist/ /usr/share/nginx/html
-# Start NGINX
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

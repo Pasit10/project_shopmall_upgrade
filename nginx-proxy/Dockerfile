@@ -8,4 +8,5 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # COPY ./ssl/privkey.pem /etc/nginx/ssl/
 
 EXPOSE 80
-# EXPOSE 443  # Uncomment when using HTTPS
+EXPOSE 443
+# Uncomment when using HTTPS
