@@ -40,12 +40,8 @@ const RegisterPage = () => {
 
     try {
       const response = await axiosInstant.post("/register", {email, password} , {withCredentials:true})
-
-      // const data = await response.json();
-
       if (response.status === 201) {
-        // console.log("Registration successful", data);
-        navigate("/login");
+        navigate("/");
       } else {
         setError("Registration failed. Please try again.");
       }
@@ -60,13 +56,8 @@ const RegisterPage = () => {
   ) => {
     try {
       const { credential } = credentialResponse
-
       const response = await axiosInstant.post("/google/login", { token: credential }, { withCredentials:true})
-
-      // const data = await response.json();
-
       if (response.status === 200) {
-        // console.log("Google Login successful", data);
         navigate("/");
       } else {
         setError(response.data || "Google Login failed.");
