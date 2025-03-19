@@ -4,6 +4,7 @@ import (
 	templateError "backend/error"
 	"backend/internal/entities"
 	"backend/middlewares"
+	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -54,6 +55,7 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 	req.Role = "user"
+	req.Logintype = "local"
 	err := h.AuthService.Register(req)
 	if err != nil {
 		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
@@ -77,44 +79,6 @@ func (h HTTPGateway) Register(c *fiber.Ctx) error {
 	c.Cookie(refreshCookie)
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Register Success"})
-}
-
-func (h HTTPGateway) RegisterWithGoogle(c *fiber.Ctx) error {
-	uid := c.Locals("uid").(string)
-	email := c.Locals("email").(string)
-	name := c.Locals("name").(string)
-	picture := c.Locals("picture").(string)
-
-	var req = entities.UserAuth{
-		UID:     uid,
-		Email:   email,
-		Name:    name,
-		Picture: picture,
-		Role:    "user",
-	}
-
-	err := h.AuthService.RegisterGoogle(req)
-	if err != nil {
-		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
-		return c.Status(httpStatusCode).JSON(errorResponse)
-	}
-
-	access_token, err := middlewares.GenerateAccessJWT(req.UID, req.Email, req.Name, req.Role) ///TODO: change role
-	if err != nil {
-		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
-		return c.Status(httpStatusCode).JSON(errorResponse)
-	}
-	refreshToken, err := middlewares.GenerateRefreshToken(req.UID) // Implement this function
-	if err != nil {
-		httpStatusCode, errorResponse := templateError.GetErrorResponse(err)
-		return c.Status(httpStatusCode).JSON(errorResponse)
-	}
-
-	cookie := generateCookie("access-token", access_token, time.Now().Add(1*time.Hour))
-	refreshCookie := generateCookie("refresh-token", refreshToken, time.Now().Add(7*time.Hour))
-	c.Cookie(cookie)
-	c.Cookie(refreshCookie)
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User created"})
 }
 
 func (h HTTPGateway) LoginWithGoogle(c *fiber.Ctx) error {
@@ -187,12 +151,49 @@ func (h HTTPGateway) Logout(c *fiber.Ctx) error {
 	accessJWT := c.Cookies("access-token")
 	refreshJWT := c.Cookies("refresh-token")
 
-	// ตรวจสอบและเพิ่ม token ลง blacklist
-	if err := validateAndBlacklistToken(accessJWT); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
-	if err := validateAndBlacklistToken(refreshJWT); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	var wg sync.WaitGroup
+	var err1, err2 error
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		parsedAccessToken, err := middlewares.ParseAccessJWT(accessJWT)
+		if err != nil || !parsedAccessToken.Valid {
+			err1 = templateError.MissingOrMalformedToken
+		}
+		claims, ok := parsedAccessToken.Claims.(jwt.MapClaims)
+		if !ok || claims["exp"] == nil {
+			err1 = templateError.MissingOrMalformedToken
+		}
+		expirationTime := int64(claims["exp"].(float64))
+		err = middlewares.BlacklistToken(accessJWT, expirationTime)
+		if err != nil {
+			err1 = templateError.MissingOrMalformedToken
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		paresdRefreshToken, err := middlewares.ParseRefreshJWT(refreshJWT)
+		if err != nil || !paresdRefreshToken.Valid {
+			err2 = templateError.MissingOrMalformedToken
+		}
+		claims, ok := paresdRefreshToken.Claims.(jwt.MapClaims)
+		if !ok || claims["exp"] == nil {
+			err2 = templateError.MissingOrMalformedToken
+		}
+		expirationTime := int64(claims["exp"].(float64))
+		err = middlewares.BlacklistToken(refreshJWT, expirationTime)
+		if err != nil {
+			err2 = templateError.MissingOrMalformedToken
+		}
+	}()
+
+	wg.Wait()
+
+	if err1 != nil || err2 != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.MissingOrMalformedToken)
+		return c.Status(httpstatuscode).JSON(errorresponse)
 	}
 
 	c.Cookie(&fiber.Cookie{
@@ -224,19 +225,4 @@ func generateCookie(name string, value string, exp time.Time) *fiber.Cookie {
 		Secure:   false, // Use true if on HTTPS
 	}
 	return cookie
-}
-
-func validateAndBlacklistToken(token string) error {
-	parsedToken, err := middlewares.ParseAccessJWT(token)
-	if err != nil || !parsedToken.Valid {
-		return templateError.MissingOrMalformedToken
-	}
-
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	if !ok || claims["exp"] == nil {
-		return templateError.MissingOrMalformedToken
-	}
-
-	expirationTime := int64(claims["exp"].(float64))
-	return middlewares.BlacklistToken(token, expirationTime)
 }

@@ -7,16 +7,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// ยังไม่แก้
 func (h HTTPGateway) GetUser(c *fiber.Ctx) error {
-	email := c.Locals("email")
-	name := c.Locals("name")
-	role := c.Locals("role")
-	return c.JSON(fiber.Map{
-		"email": email,
-		"name":  name,
-		"role":  role,
-	})
+	uid := c.Locals("uid").(string)
+
+	user, err := h.UserService.GetuserData(uid)
+	if err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.JSON(user)
 }
 
 func (h HTTPGateway) InsertCart(c *fiber.Ctx) error {
