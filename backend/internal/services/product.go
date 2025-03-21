@@ -14,6 +14,7 @@ type productService struct {
 
 type IProductService interface {
 	GetAllProduct() (*[]entities.ProductAndType, error)
+	GetProductByID(product_id int) (*entities.Product, error)
 	GetAllProductType() (*[]entities.ProductType, error)
 	GetProductByProductTypeID(typeid int) (*[]entities.Product, error)
 	CreateProduct(product entities.Product) error
@@ -34,6 +35,17 @@ func (ser productService) GetAllProduct() (*[]entities.ProductAndType, error) {
 		return nil, err
 	}
 	return products, err
+}
+
+func (ser productService) GetProductByID(product_id int) (*entities.Product, error) {
+	if product_id < 0 {
+		return nil, templateError.BadrequestError
+	}
+	product, err := ser.productRepository.GetProductByID(product_id)
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
 }
 
 func (ser productService) GetAllProductType() (*[]entities.ProductType, error) {

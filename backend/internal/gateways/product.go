@@ -18,6 +18,23 @@ func (h HTTPGateway) GetAllProduct(c *fiber.Ctx) error {
 	return c.JSON(product)
 }
 
+func (h HTTPGateway) GetProductByID(c *fiber.Ctx) error {
+	urlparams := c.Params("product_id")
+
+	productid, err := strconv.Atoi(urlparams)
+	if err != nil {
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+
+	product, err := h.ProductService.GetProductByID(productid)
+	if err != nil {
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+	return c.JSON(product)
+}
+
 func (h HTTPGateway) GetAllProductType(c *fiber.Ctx) error {
 	productType, err := h.ProductService.GetAllProductType()
 	if err != nil {
