@@ -23,7 +23,12 @@ const ProductDetail = () => {
   }, [setProduct, product_id]);
 
   // ถ้ายังโหลดข้อมูลไม่เสร็จ ให้แสดงข้อความ Loading
-  if (!product) return <p className="text-center">Loading...</p>;
+  if (!product) return (
+    <div className="container d-flex align-items-center justify-content-center flex-grow-1" style={{ height: "70vh" }}>
+      <p className="text-center">Loading...</p>
+    </div>
+  );
+  
 
   return (
     <div className="container py-5">

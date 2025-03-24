@@ -10,6 +10,7 @@ import ProductPage from "./Page/ProductPage/ProductPage";
 import AdminHomePage from "./Page/AdminHomePage/AdminHomePage";
 import CartList from "./Components/CartList";
 import ProductDetailPage from "./Page/ProductDetailPage/ProductDetailPage";
+import ProfilePage from "./Page/ProfilePage/ProfilePage";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
       <Route path="/admin/orders" element={<OrdersAdminPage/>} />
       <Route path="/cart" element={<CartList/>} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
     </Routes>
   );
 }
