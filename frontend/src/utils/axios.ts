@@ -25,7 +25,13 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
+    // ไม่ต้องยิงซ้ำหากเป็น /login, /google/login หรือ /register
     if (error.response?.status === 401 && !originalRequest._retry) {
+      const skipRetryEndpoints = ["/login", "/google/login", "/register"];
+      if (originalRequest.url && skipRetryEndpoints.includes(new URL(originalRequest.url, window.location.origin).pathname)) {
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       if (!isRefreshing) {
