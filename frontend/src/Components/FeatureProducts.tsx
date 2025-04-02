@@ -7,8 +7,11 @@ const FeaturedProducts = () => {
   // state สำหรับเก็บข้อมูลตะกร้า
   const [cart, setCart] = useState<{ [productId: number]: number }>({});
 
+
   // ฟังก์ชันเพิ่มสินค้าในตะกร้า
   const handleAddToCart = async (product: Product) => {
+    
+
     // คำนวณจำนวนสินค้าปัจจุบันในตะกร้า
     const currentQuantity = cart[product.id] || 0;
     const newQuantity = currentQuantity + 1;

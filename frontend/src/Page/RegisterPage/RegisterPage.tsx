@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import validator from "validator";
 import axiosInstant from "../../utils/axios";
-import { Lock, Mail, LogIn, UserPlus } from "lucide-react";
+import { Lock, Mail, LogIn, UserPlus , Phone , MapPin , Users} from "lucide-react";
 import { GoogleLogin , CredentialResponse } from "@react-oauth/google";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [tel, setTel] = useState("");
   const [error, setError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ const RegisterPage = () => {
     }
 
     try {
-      const response = await axiosInstant.post("/register", {email, password} , {withCredentials:true})
+      const response = await axiosInstant.post("/register", {email, password,name,address,tel} , {withCredentials:true})
       if (response.status === 201) {
         navigate("/");
       } else {
@@ -93,7 +96,7 @@ const RegisterPage = () => {
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center">
-      <div className="container py-5">
+      <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-md-8 col-lg-6 col-xl-5">
             <div
@@ -104,8 +107,8 @@ const RegisterPage = () => {
                 background: "rgba(255, 255, 255, 0.95)",
               }}
             >
-              <div className="card-header text-center border-0 bg-transparent pt-4">
-                <div className="d-inline-flex align-items-center justify-content-center bg-primary rounded-circle p-3 mb-3">
+              <div className="card-header text-center border-0 bg-transparent pt-4 mt-1">
+                <div className="d-inline-flex align-items-center justify-content-center bg-primary rounded-circle p-3 mb-2">
                   <UserPlus size={30} className="text-white" />
                 </div>
                 <h3 className="fw-bold mb-0">Create Your Account</h3>
@@ -162,6 +165,57 @@ const RegisterPage = () => {
                         <small>{passwordError}</small>
                       </div>
                     )}
+                  </div>
+
+                  <div className="form-group mb-4">
+                    <div className="input-group input-group-lg">
+                      <span className="input-group-text bg-light border-end-0">
+                        <Users size={18} className="text-primary" />
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control border-start-0 ps-0"
+                        placeholder="Your name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        style={{ borderLeftColor: "transparent" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group mb-4">
+                    <div className="input-group input-group-lg">
+                      <span className="input-group-text bg-light border-end-0">
+                        <MapPin size={18} className="text-primary" />
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control border-start-0 ps-0"
+                        placeholder="Your address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        required
+                        style={{ borderLeftColor: "transparent" }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group mb-4">
+                    <div className="input-group input-group-lg">
+                      <span className="input-group-text bg-light border-end-0">
+                        <Phone size={18} className="text-primary" />
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control border-start-0 ps-0"
+                        placeholder="Your tel"
+                        value={tel}
+                        onChange={(e) => setTel(e.target.value)}
+                        required
+                        style={{ borderLeftColor: "transparent" }}
+                      />
+                    </div>
                   </div>
 
                   <button

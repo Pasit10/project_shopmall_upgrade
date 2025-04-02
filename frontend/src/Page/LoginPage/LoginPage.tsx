@@ -5,6 +5,7 @@ import axiosInstant from "../../utils/axios";
 // import {axios} from 'axios'
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Lock, Mail, LogIn, UserPlus } from "lucide-react";
+import { AxiosError } from "axios";
 
 
 const LoginPage = () => {
@@ -28,24 +29,17 @@ const LoginPage = () => {
         { email, password },
         { withCredentials: true }
       );
-  
+      
       if (response.status === 200) {
-        const { role } = response.data; // ดึง role จาก response
-        console.log("",role);
-        if (role === "admin") {
-          navigate("/homeadmin");
-        } else if (role === "user") {
-          navigate("/");
-        } else {
-          setError("Invalid user role.");
-        }
+        console.log("Login successful:", response.data);
+        navigate("/");
       } else {
         setError("Invalid email or password.");
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-        console.error("Login error:", error.message);
+      if (error instanceof AxiosError) {
+        setError(error.response?.data.english_description);
+        console.error("Login error:", error);
       } else {
         setError("An unknown error occurred.");
       }

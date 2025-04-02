@@ -11,7 +11,7 @@ const CartList = () => {
    const fetchCartItems = async () => {
     try {
       // ดึงข้อมูลสินค้าจาก API (รวมทั้ง `product_id`, `qty` และ `Product` object)
-      const response = await axiosInstance.get("/cart", { withCredentials: true });
+      const response = await axiosInstance.get("/user/cart", { withCredentials: true });
       if(response.status===200){
         setCartItems(response.data);
       }
