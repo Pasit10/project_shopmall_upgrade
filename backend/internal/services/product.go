@@ -4,7 +4,6 @@ import (
 	templateError "backend/error"
 	"backend/internal/entities"
 	"backend/internal/repositories"
-	"fmt"
 	"strings"
 )
 
@@ -126,7 +125,6 @@ func (ser productService) DeleteProduct(product_id int) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("test")
 
 	if err := ser.productRepository.DeleteProduct(product_id); err != nil {
 		return err

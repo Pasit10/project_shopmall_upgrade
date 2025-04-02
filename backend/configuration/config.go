@@ -8,7 +8,7 @@ import (
 
 func NewConfiguraiton() fiber.Config {
 	return fiber.Config{
-		AppName:     "Furniture Shop",
+		AppName:     "Furniture Shop ༼ つ ◕_◕ ༽つ ",
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
 		// Prefork:     true,
