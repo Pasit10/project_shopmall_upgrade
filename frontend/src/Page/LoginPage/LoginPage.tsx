@@ -31,6 +31,7 @@ const LoginPage = () => {
       );
 
       if (response.status === 200) {
+        
         console.log("Login successful:", response.data);
         navigate("/");
       } else {

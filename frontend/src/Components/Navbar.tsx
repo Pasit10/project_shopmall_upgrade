@@ -10,12 +10,16 @@ const Navbar = () => {
     const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
     const isUserfetched = useRef(false);
+    const [isAdminBtnOpen, setIsAdminBtnOpen] = useState(false);
 
     const fetchUser = useCallback(async () => {
         if (isUserfetched.current) return;
         try {
             const response = await axiosInstant.get("/user/me", { withCredentials: true });
             if (response.status === 200) {
+                if (response.data.role === 'admin') {
+                    setIsAdminBtnOpen(true);
+                  }
                 setUser(response.data);
                 isUserfetched.current = true;
             }
@@ -63,16 +67,18 @@ const Navbar = () => {
                     <li>
                         <button className="dropdown-item" onClick={() => navigate("/profile")}>Profile</button>
                     </li>
+                    {isAdminBtnOpen && (
                     <li>
-                        <button className="dropdown-item" onClick={() => navigate("/orders")}>Orders</button>
+                        <button className="dropdown-item" onClick={() => navigate("/admin")}>Admin</button>
                     </li>
+                    )}
                     <li>
                         <button className="dropdown-item" onClick={Logout}>Logout</button>
                     </li>
                 </ul>
             </div>
         );
-    }, [user, Logout, navigate]);
+    }, [user, isAdminBtnOpen, Logout, navigate]);
 
     return (
         <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top w-100 px-5">

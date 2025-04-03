@@ -100,7 +100,7 @@ const Navbar = () => {
                         <a className="nav-link fw-medium" href="#">About</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link fw-medium" href="/admin">Admin</a>
+                        <a className="nav-link fw-medium" href="/admin" >Admin</a>
                     </li>
                 </ul>
                 <div className="d-flex align-items-center">
