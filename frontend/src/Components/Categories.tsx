@@ -1,6 +1,8 @@
 // import { useState , useEffect } from "react";
 // import axiosInstant from "../utils/axios";
 
+import { useNavigate } from "react-router-dom";
+
 const categories = [
 	{
 		id: 1,
@@ -50,39 +52,40 @@ const Categories = () => {
 
     //     fetchData();
     // }, []);
+	const navigate = useNavigate();
+
+    const handleCategoryClick = (categoryId: number) => {
+        navigate(`/shop?category=${categoryId}`);
+    };
 
 	return (<div className="bg-light py-5">
 		<div className="container">
 			<div className="text-center mb-5">
 				<h2 className="fw-bold">Shop by Category</h2>
-				<p className="text-muted">
-					Find the perfect furniture for every room in your home
-				</p>
+				<p className="text-muted">Find the perfect furniture for every room in your home</p>
 			</div>
-
-			<div className="row"> {
-				categories.map((category) => (<div key={
-						category.id
-					}
-					className="col-md-6 col-lg-4">
-					<a href="#" className="text-decoration-none">
-						<div className="category-card">
-							<img src={
-									category.imageSrc
-								}
-								alt={
-									category.name
-								}/>
-							<div className="category-overlay">
-								<h3 className="h5 fw-bold mb-1"> {
-									category.name
-								}</h3>
-								<p className="small mb-0">Shop now</p>
+			<div className="row">
+				{categories.map((category) => (
+					<div key={category.id} className="col-md-6 col-lg-4">
+						<a
+							href="#"
+							className="text-decoration-none"
+							onClick={(e) => {
+								e.preventDefault(); // ป้องกันการ reload หน้า
+								handleCategoryClick(category.id);
+							}}
+						>
+							<div className="category-card">
+								<img src={category.imageSrc} alt={category.name} />
+								<div className="category-overlay">
+									<h3 className="h5 fw-bold mb-1">{category.name}</h3>
+									<p className="small mb-0">Shop now</p>
+								</div>
 							</div>
-						</div>
-					</a>
-				</div>))
-			} </div>
+						</a>
+					</div>
+				))}
+			</div>
 		</div>
 	</div>);
 };

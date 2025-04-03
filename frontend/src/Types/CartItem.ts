@@ -3,5 +3,5 @@ export default interface CartItem {
     qty: number;
     product_name: string;
     price_per_unit: number;
-    is_select: boolean;
+    is_select: string;
   }
