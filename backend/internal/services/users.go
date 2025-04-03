@@ -18,6 +18,7 @@ type IUserService interface {
 	InsertCart(uid string, cart_data entities.InsertCart) error
 	GetCartByUID(uid string) (*[]entities.CartResponse, error)
 	UpdateCartManyByUID(uid string, cart_data []entities.Cart) error
+	DeleteCartByUID(uid string, idproduct int) error
 }
 
 func InitUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IProductRepository, repo2 repositories.ICartRepository, repo3 repositories.ITransactionRepository) IUserService {
@@ -40,6 +41,7 @@ func (ser usersService) GetuserData(uid string) (*entities.UserData, error) {
 	}
 	return user, nil
 }
+
 func (ser usersService) InsertCart(uid string, cart_data entities.InsertCart) error {
 	if cart_data.IDproduct < 0 {
 		return templateError.BadrequestError
@@ -60,7 +62,7 @@ func (ser usersService) InsertCart(uid string, cart_data entities.InsertCart) er
 		if err == templateError.CartNotFoundError {
 			newCart := entities.Cart{
 				UID:       uid,
-				IDproduct: cart_data.IDproduct,
+				IDproduct: int(cart_data.IDproduct),
 				Quantity:  quantity,
 				Isselect:  "F",
 			}
@@ -69,29 +71,24 @@ func (ser usersService) InsertCart(uid string, cart_data entities.InsertCart) er
 		return err
 	}
 	newQuantity := cart.Quantity + quantity
-	if newQuantity > product.Stockqtyfrontend {
+	if newQuantity > int(product.Stockqtyfrontend) {
 		return templateError.InsufficientStockError
 	}
 
 	updateCart := entities.Cart{
 		UID:       uid,
-		IDproduct: cart_data.IDproduct,
+		IDproduct: int(cart_data.IDproduct),
 		Quantity:  newQuantity,
 		Isselect:  "F",
 	}
 
-	if err := ser.cartRepository.UpdateCart(uid, cart.IDproduct, updateCart); err != nil {
+	if err := ser.cartRepository.UpdateCart(uid, int32(cart.IDproduct), updateCart); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (ser usersService) GetCartByUID(uid string) (*[]entities.CartResponse, error) {
-	_, err := ser.usersRepository.GetUserData(uid)
-	if err != nil {
-		return nil, err
-	}
-
 	data, err := ser.cartRepository.GetCartByUID(uid)
 	if err != nil {
 		return nil, err
@@ -100,20 +97,35 @@ func (ser usersService) GetCartByUID(uid string) (*[]entities.CartResponse, erro
 }
 
 func (ser usersService) UpdateCartManyByUID(uid string, cart_data []entities.Cart) error {
-	_, err := ser.usersRepository.GetUserData(uid)
-	if err != nil {
-		return err
-	}
-
 	if len(cart_data) == 0 {
 		return templateError.BadrequestError
 	}
 
 	for index, cart := range cart_data {
 		cart_data[index].UID = uid
-		if err := ser.cartRepository.UpdateCart(uid, cart.IDproduct, cart); err != nil {
+
+		product, err := ser.productRepository.GetProductByID(cart.IDproduct)
+		if err != nil {
 			return err
 		}
+		if cart.Quantity > int(product.Stockqtyfrontend) {
+			return templateError.InsufficientStockError
+		}
+
+		if err := ser.cartRepository.UpdateCart(uid, int32(cart.IDproduct), cart); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (ser usersService) DeleteCartByUID(uid string, idproduct int) error {
+	if _, err := ser.cartRepository.FindCart(uid, idproduct); err != nil {
+		return err
+	}
+
+	if err := ser.cartRepository.DeleteCart(uid, idproduct); err != nil {
+		return err
 	}
 	return nil
 }

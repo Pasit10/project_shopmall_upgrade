@@ -17,6 +17,7 @@ type ICartRepository interface {
 	CreateCart(cartdata entities.Cart) error
 	FindCart(uid string, idproduct int) (*entities.Cart, error)
 	UpdateCart(uid string, idproduct int32, cartdata entities.Cart) error
+	DeleteCart(uid string, idproduct int) error
 }
 
 func InitCartRepository(db *gorm.DB) ICartRepository {
@@ -88,7 +89,7 @@ func (repo cartRepository) UpdateCart(uid string, idproduct int32, cartdata enti
 	return nil
 }
 
-func (repo cartRepository) DeleteCart(uid string, idproduct int32) error {
+func (repo cartRepository) DeleteCart(uid string, idproduct int) error {
 	if repo.DB == nil {
 		return templateError.DatabaseConnectedError
 	}
@@ -103,20 +104,3 @@ func (repo cartRepository) DeleteCart(uid string, idproduct int32) error {
 	}
 	return nil
 }
-
-// func (repo productRepository) UpdateProduct(product_id int, product entities.Product) error {
-// 	if repo.DB == nil {
-// 		return templateError.DatabaseConnectedError
-// 	}
-
-// 	if err := repo.DB.Transaction(func(tx *gorm.DB) error {
-// 		if err := tx.Table("products").Where("idproduct = ?", product_id).Updates(&product).Error; err != nil {
-// 			return err
-// 		} else {
-// 			return nil
-// 		}
-// 	}); err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }

@@ -4,6 +4,7 @@ import (
 	templateError "backend/error"
 	"backend/internal/entities"
 	"encoding/json"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -49,15 +50,34 @@ func (h HTTPGateway) GetCartByUID(c *fiber.Ctx) error {
 func (h HTTPGateway) UpdateCartManyByUID(c *fiber.Ctx) error {
 	uid := c.Locals("uid").(string)
 
-	var data []entities.Cart
-	if err := json.Unmarshal(c.Body(), &data); err != nil {
-		httpStatusCode, errorResponse := templateError.GetErrorResponse(templateError.BadrequestError)
-		return c.Status(httpStatusCode).JSON(errorResponse)
+	var requestData entities.UpdateCart
+
+	if err := json.Unmarshal(c.Body(), &requestData); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
 	}
 
-	if err := h.UserService.UpdateCartManyByUID(uid, data); err != nil {
+	if err := h.UserService.UpdateCartManyByUID(uid, requestData.Cart); err != nil {
 		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
 		return c.Status(httpstatuscode).JSON(errorresponse)
 	}
+	return c.JSON(fiber.Map{"message": "success"})
+}
+
+func (h HTTPGateway) DeleteCartByUID(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	idproduct_str := c.Params("product_id")
+	idproduct, err := strconv.Atoi(idproduct_str)
+	if err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	if err := h.UserService.DeleteCartByUID(uid, idproduct); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
 	return c.JSON(fiber.Map{"message": "success"})
 }
