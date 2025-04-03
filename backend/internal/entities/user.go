@@ -22,6 +22,7 @@ type UserData struct {
 	Name      string `json:"name"`
 	Picture   string `json:"picture"`
 	Address   string `json:"address"`
+	Tel       string `json:"tel"`
 	Role      string `json:"role"`
 	Logintype string `json:"login_type"`
 }
