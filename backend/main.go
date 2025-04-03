@@ -51,11 +51,11 @@ func main() {
 	productRepo := repo.InitProdcutRepository(mysql)
 	usersRepo := repo.InitUsersRepository(mysql)
 	cartRepo := repo.InitCartRepository(mysql)
-	// tranxRepo := repo.InitTransactionRepository(mysql)
+	tranxRepo := repo.InitTransactionRepository(mysql)
 
 	authService := ser.InitAuthenService(authRepo)
 	produteService := ser.InitProductService(productRepo)
-	usersService := ser.InitUsersService(usersRepo, productRepo, cartRepo)
+	usersService := ser.InitUsersService(usersRepo, productRepo, cartRepo, tranxRepo)
 
 	gateways.InitHTTPGateway(app, authService, produteService, usersService)
 

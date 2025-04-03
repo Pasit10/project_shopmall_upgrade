@@ -10,6 +10,7 @@ type usersService struct {
 	usersRepository   repositories.IUsersRepository
 	productRepository repositories.IProductRepository
 	cartRepository    repositories.ICartRepository
+	tranxRepository   repositories.ITransactionRepository
 }
 
 type IUserService interface {
@@ -19,11 +20,12 @@ type IUserService interface {
 	UpdateCartManyByUID(uid string, cart_data []entities.Cart) error
 }
 
-func InitUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IProductRepository, repo2 repositories.ICartRepository) IUserService {
+func InitUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IProductRepository, repo2 repositories.ICartRepository, repo3 repositories.ITransactionRepository) IUserService {
 	return &usersService{
 		usersRepository:   repo0,
 		productRepository: repo1,
 		cartRepository:    repo2,
+		tranxRepository:   repo3,
 	}
 }
 
