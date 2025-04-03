@@ -25,11 +25,10 @@ const CartList = () => {
       //     price_per_unit: item.product.price_per_unit,
       //   };
       // });
-  
     } catch (error) {
       console.error("Error fetching cart items", error);
     }
-  };  
+  };
 
   // ฟังก์ชันสำหรับเพิ่มหรือลดจำนวนสินค้า
   const handleQuantityChange = async (productId: number, newQuantity: number) => {
@@ -71,7 +70,7 @@ const CartList = () => {
   }, []);
 
   // คำนวณราคาทั้งหมดในตะกร้า
-  const totalPrice = cartItems.reduce((total, item) => total + item.price_per_unit * item.quantity, 0);
+  const totalPrice = cartItems.reduce((total, item) => total + item.price_per_unit * item.qty, 0);
 
   return (
     <div className="container py-5">
@@ -94,14 +93,14 @@ const CartList = () => {
                         <div>
                           <button
                             className="btn btn-secondary"
-                            onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}
+                            onClick={() => handleQuantityChange(item.product_id, item.qty - 1)}
                           >
                             -
                           </button>
-                          <span className="mx-2">{item.quantity}</span>
+                          <span className="mx-2">{item.qty}</span>
                           <button
                             className="btn btn-secondary"
-                            onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}
+                            onClick={() => handleQuantityChange(item.product_id, item.qty + 1)}
                           >
                             +
                           </button>
@@ -116,7 +115,7 @@ const CartList = () => {
                         </div>
                       </div>
                       <p className="mt-3">
-                        Total: ${item.price_per_unit * item.quantity}
+                        Total: ${item.price_per_unit * item.qty}
                       </p>
                     </div>
                   </div>

@@ -1,40 +1,34 @@
-import { useState } from "react";
+// import { useState } from "react";
 import axiosInstance from "../utils/axios";
 import Product from "../Types/Product";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const FeaturedProducts = () => {
   // state สำหรับเก็บข้อมูลตะกร้า
-  const [cart, setCart] = useState<{ [productId: number]: number }>({});
+  // const [cart, setCart] = useState<{ [productId: number]: number }>({});
+  const navigate = useNavigate();
 
-
-  // ฟังก์ชันเพิ่มสินค้าในตะกร้า
   const handleAddToCart = async (product: Product) => {
-    
-
-    // คำนวณจำนวนสินค้าปัจจุบันในตะกร้า
-    const currentQuantity = cart[product.id] || 0;
-    const newQuantity = currentQuantity + 1;
-
-    // อัพเดต state ของ cart
-    setCart((prevCart) => ({
-      ...prevCart,
-      [product.id]: newQuantity,
-    }));
-
-    // ส่งข้อมูลไปที่เซิร์ฟเวอร์
     try {
-      await axiosInstance.post(
+      const response = await axiosInstance.post(
         "/user/cart",
+        { id: product.id },
         {
-          product_id: product.id,
-          quantity: newQuantity,
-        },
-        { withCredentials: true }
+          withCredentials: true,
+          validateStatus: (status) => status < 500 // ให้ถือว่า 4xx เป็น error
+        }
       );
-      alert("Added to cart!");
-    } catch (error) {
+      if (response.status === 200) {
+        alert("Added to cart!");
+      } else if (response.status === 401) {
+        alert("You need to log in to add items to the cart.");
+        navigate("/login")
+      } else {
+        alert("Failed to add to cart. Please try again.");
+      }
+    } catch (error: unknown) {
       console.error("Error adding to cart", error);
+      alert("Something went wrong. Please check your connection.");
     }
   };
 

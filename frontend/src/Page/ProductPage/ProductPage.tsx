@@ -13,7 +13,7 @@ function ProductPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [product, setProduct] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  
+
   const isFetched = useRef(false);
 
   const fetchCategories = async () => {

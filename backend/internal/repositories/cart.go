@@ -31,7 +31,7 @@ func (repo cartRepository) GetCartByUID(uid string) (*[]entities.CartResponse, e
 	}
 
 	var result []entities.CartResponse
-	if err := repo.DB.Table("cart").Select("cart.idproduct,productname,priceperunit,quantity").
+	if err := repo.DB.Table("cart").Select("cart.idproduct,productname,priceperunit,quantity,isselect,stockqtyfrontend").
 		Joins("INNER JOIN Products ON Products.idproduct = cart.idproduct").
 		Where("uid = ?", uid).Find(&result).Error; err != nil {
 		return nil, err
@@ -82,6 +82,22 @@ func (repo cartRepository) UpdateCart(uid string, idproduct int32, cartdata enti
 		} else {
 			return nil
 		}
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo cartRepository) DeleteCart(uid string, idproduct int32) error {
+	if repo.DB == nil {
+		return templateError.DatabaseConnectedError
+	}
+
+	if err := repo.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Table("cart").Where("uid = ? and idproduct = ?", uid, idproduct).Delete(&entities.Cart{}).Error; err != nil {
+			return err
+		}
+		return nil
 	}); err != nil {
 		return err
 	}

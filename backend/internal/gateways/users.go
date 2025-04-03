@@ -3,6 +3,7 @@ package gateways
 import (
 	templateError "backend/error"
 	"backend/internal/entities"
+	"encoding/json"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -43,4 +44,20 @@ func (h HTTPGateway) GetCartByUID(c *fiber.Ctx) error {
 		return c.Status(httpstatuscode).JSON(errorresponse)
 	}
 	return c.JSON(cart)
+}
+
+func (h HTTPGateway) UpdateCartManyByUID(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	var data []entities.Cart
+	if err := json.Unmarshal(c.Body(), &data); err != nil {
+		httpStatusCode, errorResponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorResponse)
+	}
+
+	if err := h.UserService.UpdateCartManyByUID(uid, data); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.JSON(fiber.Map{"message": "success"})
 }

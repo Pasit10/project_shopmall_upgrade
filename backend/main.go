@@ -51,6 +51,7 @@ func main() {
 	productRepo := repo.InitProdcutRepository(mysql)
 	usersRepo := repo.InitUsersRepository(mysql)
 	cartRepo := repo.InitCartRepository(mysql)
+	// tranxRepo := repo.InitTransactionRepository(mysql)
 
 	authService := ser.InitAuthenService(authRepo)
 	produteService := ser.InitProductService(productRepo)

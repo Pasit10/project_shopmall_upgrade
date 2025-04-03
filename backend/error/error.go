@@ -115,6 +115,7 @@ var (
 	ProductNotFoundError     TemplateError = New("Product_not_found")
 	ProductTypeNotFoundError TemplateError = New("ProductType_not_found")
 	CartNotFoundError        TemplateError = New("Cart_not_found")
+	InsufficientStockError   TemplateError = New("Inufficient_Stock_Error")
 )
 
 var HttpStatusCodes = map[error]int{
@@ -131,12 +132,14 @@ var HttpStatusCodes = map[error]int{
 	ProductNotFoundError:     404,
 	ProductTypeNotFoundError: 404,
 	CartNotFoundError:        404,
+	InsufficientStockError:   400,
 }
 
 var CodesError = map[error]string{
 	BadrequestError:          "4000",
 	EmailAlreadyExistError:   "4001",
 	EmailInvaildFormatError:  "4002",
+	InsufficientStockError:   "4003",
 	UnauthorizedError:        "4010",
 	WrongUserOrPasswordError: "4011",
 	MissingOrMalformedToken:  "4012",
@@ -163,6 +166,7 @@ var ThaiDescription = map[error]string{
 	ProductNotFoundError:     "ไม่พบ product",
 	ProductTypeNotFoundError: "ไม่พบ product type",
 	CartNotFoundError:        "ไม่พบ cart",
+	InsufficientStockError:   "สินค้ามีไม่เพียงพอต่อคำสั่งซื้อ",
 }
 
 var EnglishDescription = map[error]string{
@@ -179,6 +183,7 @@ var EnglishDescription = map[error]string{
 	ProductNotFoundError:     "Product not found",
 	ProductTypeNotFoundError: "Product type not found",
 	CartNotFoundError:        "Cart not found",
+	InsufficientStockError:   "Insufficient stock for the requested order",
 }
 
 func GetErrorResponse(err error) (int, HttpErrorResponse) {

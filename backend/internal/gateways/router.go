@@ -28,6 +28,7 @@ func UsersRoutes(app *fiber.App, gateways HTTPGateway) {
 	users.Get("/me", gateways.GetUser)
 	users.Post("/cart", gateways.InsertCart)
 	users.Get("/cart", gateways.GetCartByUID)
+	users.Put("/cart", gateways.UpdateCartManyByUID)
 }
 
 func ProductRoutes(app *fiber.App, gateways HTTPGateway) {
