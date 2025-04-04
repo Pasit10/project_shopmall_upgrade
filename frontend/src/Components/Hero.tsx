@@ -11,10 +11,10 @@ const Hero = () => {
               Discover our curated collection of designer furniture pieces that blend style, comfort, and functionality for your home.
             </p>
             <div className="d-flex flex-column flex-sm-row gap-2">
-              <a href="#" className="btn btn-primary btn-lg px-4 py-2">
+              <a href="/shop" className="btn btn-primary btn-lg px-4 py-2" >
                 Shop Now
               </a>
-              <a href="#" className="btn btn-outline-primary btn-lg px-4 py-2">
+              <a href="/categories" className="btn btn-outline-primary btn-lg px-4 py-2">
                 View Collections
               </a>
             </div>

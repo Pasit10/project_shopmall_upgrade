@@ -1,5 +1,5 @@
-import Product from "./Product";
+// import Product from "./Product";
 
-export default interface ProductCardProps {
-    product: Product;
-  }
+// export default interface ProductCardProps {
+//     product: Product;
+//   }

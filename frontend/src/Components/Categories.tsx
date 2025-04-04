@@ -59,7 +59,7 @@ const Categories = () => {
     };
 
 	return (<div className="bg-light py-5">
-		<div className="container">
+		<div className="container" style={{ minHeight: "85vh" }}>
 			<div className="text-center mb-5">
 				<h2 className="fw-bold">Shop by Category</h2>
 				<p className="text-muted">Find the perfect furniture for every room in your home</p>
