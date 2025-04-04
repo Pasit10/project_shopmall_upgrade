@@ -4,6 +4,7 @@ import (
 	templateError "backend/error"
 	"backend/internal/entities"
 	"backend/internal/repositories"
+	"fmt"
 )
 
 type usersService struct {
@@ -19,6 +20,7 @@ type IUserService interface {
 	GetCartByUID(uid string) (*[]entities.CartResponse, error)
 	UpdateCartManyByUID(uid string, cart_data []entities.Cart) error
 	DeleteCartByUID(uid string, idproduct int) error
+	CreateTransaction(uid string) error
 }
 
 func InitUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IProductRepository, repo2 repositories.ICartRepository, repo3 repositories.ITransactionRepository) IUserService {
@@ -106,6 +108,7 @@ func (ser usersService) UpdateCartManyByUID(uid string, cart_data []entities.Car
 
 		product, err := ser.productRepository.GetProductByID(cart.IDproduct)
 		if err != nil {
+			fmt.Println("t")
 			return err
 		}
 		if cart.Quantity > int(product.Stockqtyfrontend) {
@@ -128,4 +131,8 @@ func (ser usersService) DeleteCartByUID(uid string, idproduct int) error {
 		return err
 	}
 	return nil
+}
+
+func (ser usersService) CreateTransaction(uid string) error {
+	return ser.tranxRepository.CreateTransaction(uid)
 }

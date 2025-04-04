@@ -2,28 +2,17 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../utils/axios";
 import CartItem from "../Types/CartItem";
 import Navbar from "./Navbar";
+import { AxiosError } from "axios";
 
 const CartList = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [localQuantities, setLocalQuantities] = useState<{ [key: number]: number }>({});
+  // const [localQuantities, setLocalQuantities] = useState<{ [key: number]: number }>({});
 
   const fetchCartItems = async () => {
     try {
       const response = await axiosInstance.get("/user/cart", { withCredentials: true });
       if (response.status === 200) {
-        const updatedCart = response.data.map((item: CartItem) => ({
-          ...item,
-          is_select: item.is_select || "F", // กำหนดค่าเริ่มต้นเป็น "F"
-        }));
-
-        setCartItems(updatedCart);
-
-        // เซ็ตค่า localQuantities ให้ตรงกับค่าจาก API
-        const quantities = updatedCart.reduce((acc: { [key: number]: number }, item: CartItem) => {
-          acc[item.product_id] = item.qty;
-          return acc;
-        }, {});
-        setLocalQuantities(quantities);
+        setCartItems(response.data)
       }
     } catch (error) {
       console.error("Error fetching cart items", error);
@@ -37,77 +26,63 @@ const CartList = () => {
   const handleSelectItem = (productId: number) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.product_id === productId ? { ...item, is_select: item.is_select === "T" ? "F" : "T" } : item
+        item.id === productId ? { ...item, is_select: item.is_select === "T" ? "F" : "T" } : item
       )
     );
   };
 
-  const handleLocalQuantityChange = (productId: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    setLocalQuantities((prev) => ({ ...prev, [productId]: newQuantity }));
-  };
-
   const handleCheckout = async () => {
-    const selectedItems = cartItems.filter((item) => item.is_select === "T");
-
-    if (selectedItems.length === 0) {
-      alert("Please select items to checkout.");
-      return;
-    }
-
     try {
-      const itemsToUpdate = selectedItems.map((item) => ({
-        id: item.product_id,
-        qty: localQuantities[item.product_id] || 0,
-        is_select: item.is_select
-      }));
-
-      await axiosInstance.put("/user/cart", { items: itemsToUpdate }, { withCredentials: true });
-
-      const response = await axiosInstance.post(
-        "/api/order/checkout",
-        { items: selectedItems.map((item) => item.product_id) },
-        { withCredentials: true }
-      );
-
-      if (response.status === 200) {
-        setCartItems((prevItems) => prevItems.filter((item) => item.is_select !== "T"));
-
-        setLocalQuantities((prev) => {
-          const updatedQuantities = { ...prev };
-          selectedItems.forEach((item) => delete updatedQuantities[item.product_id]);
-          return updatedQuantities;
-        });
-
-        alert("Checkout successful!");
+      // const selectedItems = cartItems.filter((item) => item.is_select === "T");
+      const response = await axiosInstance.put("/user/cart", {
+        cart: cartItems
+      },{withCredentials:true});
+      if (response.status === 200){
+        setCartItems((prevItems) =>
+          prevItems.filter((item) =>
+            item.is_select === 'F'
+          )
+        )
+      }else if(response.status !== 200) {
+        throw new Error();
       }
-    } catch (error) {
-      console.error("Error during checkout", error);
-      alert("Checkout failed. Please try again.");
+      const response2 = await axiosInstance.get("/user/crate_transaction", {
+        withCredentials: true
+      })
+
+      if(response2.status !== 201) {
+        throw new Error();
+      }
+    }catch (error: unknown) {
+      if(error instanceof AxiosError){
+        alert(error.response)
+      }else {
+        alert(error)
+      }
     }
   };
 
   const handleRemoveFromCart = async (productId: number) => {
-    try {
-      const response = await axiosInstance.delete(`/api/cart/remove/${productId}`, { withCredentials: true });
-  
-      if (response.status === 200) {
-        // อัปเดต state โดยลบสินค้าที่ถูกลบออกจาก cartItems
-        setCartItems((prevItems) => prevItems.filter((item) => item.product_id !== productId));
-  
-        // ลบข้อมูลจำนวนสินค้าออกจาก localQuantities
-        setLocalQuantities((prev) => {
-          const updatedQuantities = { ...prev };
-          delete updatedQuantities[productId];
-          return updatedQuantities;
-        });
-  
-        alert("Item removed successfully!");
+    try{
+      const response = await axiosInstance.delete(`/user/cart/${productId}`, {
+        withCredentials: true
+      });
+      if(response.status === 200){
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => item.id !== productId)
+        );
       }
-    } catch (error) {
-      console.error("Error removing item from cart", error);
-      alert("Failed to remove item. Please try again.");
+    }catch(error) {
+      console.error(error)
+      alert(error)
     }
+  };
+
+  const updateItemCart = (productId: number, newQty: number) => {
+    const updatedCartItems = cartItems.map(item =>
+      (item.id === productId && newQty >= 0 && newQty <= item.stock_qty_frontend) ? { ...item, qty: newQty } : item
+    );
+    setCartItems(updatedCartItems);
   };
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price_per_unit * item.qty, 0);
@@ -123,14 +98,14 @@ const CartList = () => {
         <p className="text-center text-muted mb-5">Review your selected products</p>
 
         {cartItems.map((item) => (
-          <div key={item.product_id} className="col-12 mb-4">
+          <div key={item.id} className="col-12 mb-4">
             <div className="card border-0">
               <div className="row g-0">
                 <div className="col-md-1 d-flex align-items-center">
                   <input
                     type="checkbox"
                     checked={item.is_select === "T"}
-                    onChange={() => handleSelectItem(item.product_id)}
+                    onChange={() => handleSelectItem(item.id)}
                   />
                 </div>
                 <div className="col-md-8">
@@ -141,25 +116,25 @@ const CartList = () => {
                       <div>
                         <button
                           className="btn btn-secondary"
-                          onClick={() => handleLocalQuantityChange(item.product_id, localQuantities[item.product_id] - 1)}
+                          onClick={() => updateItemCart(item.id, item.qty - 1)}
                         >
                           -
                         </button>
-                        <span className="mx-2">{localQuantities[item.product_id]}</span>
+                        <span className="mx-2">{item.qty}</span>
                         <button
                           className="btn btn-secondary"
-                          onClick={() => handleLocalQuantityChange(item.product_id, localQuantities[item.product_id] + 1)}
+                          onClick={() => updateItemCart(item.id, item.qty + 1)}
                         >
                           +
                         </button>
                       </div>
                       <div>
-                        <button className="btn btn-danger" onClick={() => handleRemoveFromCart(item.product_id)}>
+                        <button className="btn btn-danger" onClick={() => handleRemoveFromCart(item.id)}>
                           Remove
                         </button>
                       </div>
                     </div>
-                    <p className="mt-3">Total: ${item.price_per_unit * localQuantities[item.product_id]}</p>
+                    <p className="mt-3">Total: ${item.price_per_unit * item.qty}</p>
                   </div>
                 </div>
               </div>

@@ -10,7 +10,9 @@ type transactionRepository struct {
 	DB *gorm.DB
 }
 
-type ITransactionRepository interface{}
+type ITransactionRepository interface {
+	CreateTransaction(uid string) error
+}
 
 func InitTransactionRepository(db *gorm.DB) ITransactionRepository {
 	return transactionRepository{

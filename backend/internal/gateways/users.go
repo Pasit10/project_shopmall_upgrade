@@ -81,3 +81,13 @@ func (h HTTPGateway) DeleteCartByUID(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "success"})
 }
+
+func (h HTTPGateway) CreateTransaction(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	if err := h.UserService.CreateTransaction(uid); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "success"})
+}
