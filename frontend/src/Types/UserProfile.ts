@@ -1,8 +1,8 @@
 export interface UserProfile {
     name: string;
     email: string;
-    avatar: string;
+    picture: string;
     address: string;
-    phoneNumber: string;
+    tel: string;
     memberSince: string;
   }
