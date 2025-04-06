@@ -172,49 +172,6 @@ function AdminPage() {
                 </div>
               </div>
             </div>
-
-            {/* Recent Products */}
-            <div className="col-12">
-              <div className="card">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h5 className="card-title mb-0">Recent Products</h5>
-                    <button className="btn btn-primary btn-sm">
-                      Add New Product
-                    </button>
-                  </div>
-                  <table className="table table-hover text-center">
-                    <thead>
-                      <tr>
-                        <th className="align-middle">Product ID</th>
-                        <th className="align-middle">Name</th>
-                        <th className="align-middle">Category</th>
-                        <th className="align-middle">Price</th>
-                        <th className="align-middle">Stock</th>
-                        <th className="align-middle">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="align-middle">#P001</td>
-                        <td className="align-middle">Modern Sofa</td>
-                        <td className="align-middle">Furniture</td>
-                        <td className="align-middle">$899</td>
-                        <td className="align-middle">15</td>
-                        <td className="align-middle">
-                          <button className="btn btn-outline-primary btn-sm me-2">
-                            Edit
-                          </button>
-                          <button className="btn btn-outline-danger btn-sm">
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

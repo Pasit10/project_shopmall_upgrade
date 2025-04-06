@@ -2,7 +2,7 @@ import { LayoutDashboard, Menu, X, ShoppingBag, FileText} from "lucide-react";
 import SidebarProps from "../Types/SidebarProps";
 
 
-const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
+const SidebarSuperAdmin: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   return (
     <div className={`bg-dark text-white ${sidebarOpen ? "width-280" : "width-70"}`} style={{ transition: "width 0.3s" }}>
       <div className="p-3 d-flex justify-content-between align-items-center">
@@ -15,17 +15,17 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
       </div>
       <div className="p-3">
         <div className={`nav flex-column ${!sidebarOpen && "align-items-center"}`}>
-          <a href="/admin" className="nav-link text-white mb-3 d-flex align-items-center">
-            <LayoutDashboard size={24} />
-            {sidebarOpen && <span className="ms-3">Home</span>}
-          </a>
-          <a href="/admin/product" className="nav-link text-white mb-3 d-flex align-items-center">
-            <ShoppingBag size={24} />
-            {sidebarOpen && <span className="ms-3">Products</span>}
-          </a>
-          <a href="/admin/orders" className="nav-link text-white mb-3 d-flex align-items-center">
+          <a href="/superadmin" className="nav-link text-white mb-3 d-flex align-items-center">
             <FileText size={24} />
-            {sidebarOpen && <span className="ms-3">Orders</span>}
+            {sidebarOpen && <span className="ms-3">Dashboard</span>}
+          </a>
+          <a href="/superadmin/manageadmin" className="nav-link text-white mb-3 d-flex align-items-center">
+            <LayoutDashboard size={24} />
+            {sidebarOpen && <span className="ms-3">AdminManageMent</span>}
+          </a>
+          <a href="/superadmin/log" className="nav-link text-white mb-3 d-flex align-items-center">
+            <ShoppingBag size={24} />
+            {sidebarOpen && <span className="ms-3">AdminLog</span>}
           </a>
         </div>
       </div>
@@ -33,4 +33,4 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   );
 };
 
-export default Sidebar;
+export default SidebarSuperAdmin;

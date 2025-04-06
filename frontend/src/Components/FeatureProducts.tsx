@@ -123,7 +123,7 @@ const FeaturedProducts = () => {
                       handleAddToCart(product);
                     }}
                   >
-                    Add to cart
+                    🛒 Add to cart
                   </button>
                 </div>
               </div>

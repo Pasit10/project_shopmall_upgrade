@@ -11,6 +11,9 @@ import AdminHomePage from "./Page/AdminHomePage/AdminHomePage";
 import CartList from "./Components/CartList";
 import ProductDetailPage from "./Page/ProductDetailPage/ProductDetailPage";
 import ProfilePage from "./Page/ProfilePage/ProfilePage";
+import SuperAdminPage from "./Page/SuperAdminPage/SuperAdminPage";
+import SuperAdminLogPage from "./Page/SuperAdminLogPage/SuperAdminLogPage";
+import DashboardSuperAdminPage from "./Page/DashboardSuperAdminPage/DashboardSuperAdminPage";
 
 
 function App() {
@@ -28,6 +31,9 @@ function App() {
       <Route path="/cart" element={<CartList/>} />
       <Route path="/product/:product_id" element={<ProductDetailPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/superadmin/manageadmin" element={<SuperAdminPage />} />
+      <Route path="/superadmin/log" element={<SuperAdminLogPage />} />
+      <Route path="/superadmin" element={<DashboardSuperAdminPage />} />
     </Routes>
   );
 }

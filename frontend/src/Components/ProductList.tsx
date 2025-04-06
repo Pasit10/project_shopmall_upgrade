@@ -36,7 +36,7 @@ const ProductList = ({ products, handleAddToCart }: ProductListProps) => {
                       handleAddToCart(product);
                     }}
                   >
-                    Add to cart
+                    🛒 Add to cart
                   </button>
                 </div>
               </div>

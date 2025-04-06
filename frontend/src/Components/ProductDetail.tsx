@@ -81,7 +81,6 @@ const ProductDetail = () => {
         <div className="col-md-5">
           <p className="text-muted ">{product.detail}</p>
           <h4 className="fw-bold text-end mt-5">${product.price_per_unit}</h4>
-
           <div className="text-end">
             <button
               className="btn btn-primary mt-2"

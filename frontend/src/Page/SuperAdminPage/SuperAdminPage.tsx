@@ -1,12 +1,12 @@
-import { useEffect , useCallback }  from "react";
-import FeaturedProducts from "../../Components/FeatureProducts";
-import Footer from "../../Components/Footer";
-import Hero from "../../Components/Hero";
+import { useCallback, useEffect, useState } from "react";
+import  AdminManagement  from "../../Components/AdminManagement";
+import SidebarSuperAdmin from "../../Components/SidebarSuperAdmin";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axios";
-import Navbar from "../../Components/Navbar";
+import TopBar from "../../Components/TopBar";
 
-function AdminHomePage() {
+function SuperAdminPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
 
   const fetchUser = useCallback(async () => {
@@ -22,20 +22,22 @@ function AdminHomePage() {
         console.error("Error fetching user:", error);
         navigate("/");
     }
-  }, [navigate]); // Added navigate as a dependency
+  }, [navigate]);
 
   useEffect(() => {
       fetchUser();
   }, [fetchUser]);
-
   return (
     <>
-      <Navbar />
-      <Hero />
-      <FeaturedProducts />
-      <Footer />
+      <div className="min-vh-100 d-flex">
+        <SidebarSuperAdmin sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <div className="flex-grow-1 bg-light">
+          <TopBar />
+          <AdminManagement />
+        </div>
+      </div>
     </>
   );
 }
 
-export default AdminHomePage;
+export default SuperAdminPage;
