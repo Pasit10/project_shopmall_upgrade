@@ -5,6 +5,8 @@ import { Package2 } from "lucide-react";
 import Product from "../../Types/Product";
 import AddProductPopup from "../../Components/AddProductPopup";
 import axiosInstance from "../../utils/axios";
+import EditProductPopup from "../../Components/EditProductPopup";
+import AddStockProductPopup from "../../Components/AddStockProductPopup";
 
 function AdminProduct() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -15,7 +17,6 @@ function AdminProduct() {
       const response = await axiosInstance.get("/product/", {
         withCredentials: true,
       });
-      // ตรวจสอบให้แน่ใจว่า response.data เป็นอาร์เรย์
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       }
@@ -34,15 +35,50 @@ function AdminProduct() {
       const response = await axiosInstance.post("/product/", product, {
         withCredentials: true,
       });
-      setProducts((prevProducts) => [...(prevProducts || []), response.data]); // Ensure prevProducts is an array
+      setProducts((prevProducts) => [...(prevProducts || []), response.data]);
     } catch (error) {
       console.error("Error adding product:", error);
     }
   };
 
-  const handleEdit = (product: Product) => {
-    console.log("Editing product:", product);
-    // Implement edit logic here
+  const handleProductUpdate = async (updatedProduct: Product) => {
+    try {
+      const response = await axiosInstance.put(
+        `/product/${updatedProduct.id}`,
+        updatedProduct,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === updatedProduct.id ? response.data : product
+        )
+      );
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
+  };
+
+  const handleAddStockProductUpdate = async (updatedProduct: Product) => {
+    try {
+      const response = await axiosInstance.put(
+        `/product/${updatedProduct.id}`,
+        updatedProduct,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === updatedProduct.id ? response.data : product
+        )
+      );
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
   };
 
   const handleDelete = async (productId: number) => {
@@ -62,7 +98,6 @@ function AdminProduct() {
       console.error("Error deleting product:", error);
     }
   };
-  
 
   return (
     <>
@@ -93,7 +128,8 @@ function AdminProduct() {
                               <th className="border-0">Name</th>
                               <th className="border-0">Category</th>
                               <th className="border-0">Price</th>
-                              <th className="border-0">Stock</th>
+                              <th className="border-0">Stock หน้าบ้าน</th>
+                              <th className="border-0">Stock หลังบ้าน</th>
                               <th className="border-0">Actions</th>
                             </tr>
                           </thead>
@@ -107,19 +143,38 @@ function AdminProduct() {
                                   <td>{product.product_name}</td>
                                   <td>{product.typeid || "N/A"}</td>
                                   <td>${product.price_per_unit}</td>
+                                  <td>{product.stock_qty_frontend}</td>
                                   <td>{product.stock_qty_backend}</td>
                                   <td>
                                     <button
                                       className="btn btn-outline-primary btn-sm me-2"
-                                      onClick={() => handleEdit(product)}
+                                      data-bs-toggle="modal"
+                                      data-bs-target={`#addStockProductModal-${product.id}`}
+                                    >
+                                      Add Stock
+                                    </button>
+                                    <AddStockProductPopup
+                                      product={product}
+                                      onSubmit={handleAddStockProductUpdate}
+                                      modalId={`addStockProductModal-${product.id}`}
+                                    />
+
+                                    <button
+                                      className="btn btn-outline-primary btn-sm me-2"
+                                      data-bs-toggle="modal"
+                                      data-bs-target={`#editProductModal-${product.id}`}
                                     >
                                       Edit
                                     </button>
+                                    <EditProductPopup
+                                      product={product}
+                                      onSubmit={handleProductUpdate}
+                                      modalId={`editProductModal-${product.id}`}
+                                    />
                                     <button
                                       className="btn btn-outline-danger btn-sm"
                                       onClick={() =>
-                                        product.id &&
-                                        handleDelete(product.id)
+                                        product.id && handleDelete(product.id)
                                       }
                                     >
                                       Delete

@@ -44,7 +44,7 @@ const AddProductPopup: React.FC<AddProductPopupProps> = ({ onSubmit }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     console.log(formData);
     e.preventDefault();
-    await onSubmit(formData as Product); // รอให้ onSubmit ทำงานเสร็จ
+    await onSubmit(formData as Product); // รอให้ onSubmit ทำงานเสร็จ 
     resetForm();
   };
 
