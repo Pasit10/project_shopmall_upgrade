@@ -5,6 +5,7 @@ import { User as UserIcon } from "lucide-react";
 import User from "../Types/User";
 import axiosInstant from "../utils/axios";
 import React from "react";
+import AddressModal from "./AddressModal"; // Import the separate modal component
 
 const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -12,6 +13,11 @@ const Navbar = () => {
   const isUserfetched = useRef(false);
   const [isAdminBtnOpen, setIsAdminBtnOpen] = useState(false);
   const [isSuperAdminBtnOpen, setIsSuperAdminBtnOpen] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    address: '',
+    tel: ''
+  });
 
   const fetchUser = useCallback(async () => {
     if (isUserfetched.current) return;
@@ -28,6 +34,17 @@ const Navbar = () => {
             setIsSuperAdminBtnOpen(true);
         }
         setUser(response.data);
+        console.log("User data:", response.data.address);
+        
+        // Check if address or tel is empty and show modal
+        if (response.data.address === "" || response.data.tel === "") {
+          setModalData({
+            address: response.data.address || '',
+            tel: response.data.tel || ''
+          });
+          setShowAddressModal(true);
+        }
+        
         isUserfetched.current = true;
       }
     } catch (error) {
@@ -53,6 +70,12 @@ const Navbar = () => {
       console.error("Logout Error:", error);
     }
   }, [navigate]);
+
+  // Handle saving user data from modal
+  const handleSaveUserData = (updatedData: { address: string; tel: string }) => {
+    setUser(prev => prev ? {...prev, ...updatedData} : null);
+    setShowAddressModal(false);
+  };
 
   const userDropdown = useMemo(() => {
     if (!user) {
@@ -116,69 +139,79 @@ const Navbar = () => {
   }, [user, isAdminBtnOpen, Logout, navigate]);
 
   return (
-    <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top w-100 px-5">
-      <a className="navbar-brand fw-bold fs-4" href="/">
-        LUXE
-      </a>
-      <button
-        className="navbar-toggler border-0"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-      >
-        <Menu size={24} />
-      </button>
-      <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav me-auto">
-          <li className="nav-item">
-            <button
-              className="nav-link fw-medium btn btn-link"
-              onClick={() => navigate("/")}
-            >
-              Home
+    <>
+      <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top w-100 px-5">
+        <a className="navbar-brand fw-bold fs-4" href="/">
+          LUXE
+        </a>
+        <button
+          className="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <Menu size={24} />
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav me-auto">
+            <li className="nav-item">
+              <button
+                className="nav-link fw-medium btn btn-link"
+                onClick={() => navigate("/")}
+              >
+                Home
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                className="nav-link fw-medium btn btn-link"
+                onClick={() => navigate("/shop")}
+              >
+                Shop
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                className="nav-link fw-medium btn btn-link"
+                onClick={() => navigate("/categories")}
+              >
+                Categories
+              </button>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link fw-medium" href="#">
+                About
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link fw-medium" href="#">
+                Contact
+              </a>
+            </li>
+          </ul>
+          <div className="d-flex align-items-center">
+            <button className="btn btn-link text-dark p-2">
+              <Search size={25} />
             </button>
-          </li>
-          <li className="nav-item">
             <button
-              className="nav-link fw-medium btn btn-link"
-              onClick={() => navigate("/shop")}
+              className="btn btn-link text-dark p-2 position-relative"
+              onClick={() => navigate("/cart")}
             >
-              Shop
+              <ShoppingCart size={25} />
             </button>
-          </li>
-          <li className="nav-item">
-            <button
-              className="nav-link fw-medium btn btn-link"
-              onClick={() => navigate("/categories")}
-            >
-              Categories
-            </button>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link fw-medium" href="#">
-              About
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link fw-medium" href="#">
-              Contact
-            </a>
-          </li>
-        </ul>
-        <div className="d-flex align-items-center">
-          <button className="btn btn-link text-dark p-2">
-            <Search size={25} />
-          </button>
-          <button
-            className="btn btn-link text-dark p-2 position-relative"
-            onClick={() => navigate("/cart")}
-          >
-            <ShoppingCart size={25} />
-          </button>
-          {userDropdown}
+            {userDropdown}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+      
+      {/* Use the imported address modal component */}
+      <AddressModal 
+        show={showAddressModal}
+        onClose={() => navigate("/profile")}
+        initialData={modalData}
+        onSave={handleSaveUserData}
+      />
+    </>
   );
 };
 

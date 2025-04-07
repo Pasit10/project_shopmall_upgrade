@@ -1,41 +1,53 @@
 package entities
 
-// CREATE TABLE TransactionStatus (
-//     IDStatus INT,
-//     Name VARCHAR(20),
-//     PRIMARY KEY (IDStatus)
-// )
+import (
+	"time"
+)
 
-// CREATE TABLE TransactionLog (
-//     IDTransaction INT NOT NULL,
-//     Seq INT,
-//     Timestamp Timestamp,
-//     IDStatus INT NOT NULL,
-//     IDAdmin INT,
-//     PRIMARY KEY (IDTransaction,Seq),
-//     FOREIGN KEY (IDStatus) REFERENCES TransactionStatus(IDStatus),
-//     FOREIGN KEY (IDAdmin) REFERENCES ADMIN(IDADMIN)
-// )
+type Transaction struct {
+	IdTransaction int       `gorm:"column:idtransaction;primaryKey;autoIncrement" json:"idtransaction"`
+	TotalPrice    float64   `gorm:"column:totalprice" json:"totalprice"`
+	Timestamp     time.Time `gorm:"column:timestamp" json:"timestamp"`
+	VAT           float64   `gorm:"column:vat" json:"vat"`
+	UID           string    `gorm:"column:uid;size:50;not null" json:"uid"`
+	IdStatus      int       `gorm:"column:idstatus;not null" json:"idstatus"`
 
-// CREATE TABLE Transaction(
-//     IDTransaction INT PRIMARY KEY AUTO_INCREMENT,
-//     TotalPrice DECIMAL(8,2),
-//     Timestamp TIMESTAMP,
-//     VAT DECIMAL(10,2),
-//     IDCust INT NOT NULL,
-//     IDStatus INT NOT NULL,
-//     FOREIGN KEY (IDCust) REFERENCES Customer(IDCust),
-//     FOREIGN KEY (IDStatus) REFERENCES TransactionStatus(IDStatus)
-// );
+	// GORM will automatically detect the foreign key relationship
+	TransactionDetails []TransactionDetail `gorm:"foreignKey:IdTransaction" json:"transaction_details"`
+}
 
-// CREATE TABLE TransactionDetail (
-//     IDtransaction INT NOT NULL,
-//     Seq INT NOT NULL,
-//     PRICE_NOVAT DECIMAL(8,2),
-//     VAT DECIMAL(8,2),
-//     QTY INT,
-//     IDProduct INT NOT NULL,
-//     PRIMARY KEY (IDtransaction, Seq),
-//     FOREIGN KEY (IDtransaction) REFERENCES Transaction(IDtransaction),
-//     FOREIGN KEY (IDProduct) REFERENCES Stock(IDProduct)
-// );
+func (Transaction) TableName() string {
+	return "transactions"
+}
+
+type TransactionDetail struct {
+	IdTransaction int     `gorm:"column:idtransaction;primaryKey" json:"idtransaction"`
+	Seq           int     `gorm:"column:seq;primaryKey" json:"seq"`
+	PriceNoVAT    float64 `gorm:"column:price_novat" json:"price_novat"`
+	VAT           float64 `gorm:"column:vat" json:"vat"`
+	Qty           int     `gorm:"column:qty" json:"qty"`
+	IdProduct     int     `gorm:"column:idproduct" json:"idproduct"`
+}
+
+func (TransactionDetail) TableName() string {
+	return "transactiondetail"
+}
+
+type TransactionWithStatus struct {
+	IdTransaction int       `gorm:"column:idtransaction;primaryKey;autoIncrement" json:"idtransaction"`
+	TotalPrice    float64   `gorm:"column:totalprice" json:"totalprice"`
+	Timestamp     time.Time `gorm:"column:timestamp" json:"timestamp"`
+	VAT           float64   `gorm:"column:vat" json:"vat"`
+	UID           string    `gorm:"column:uid;size:50;not null" json:"uid"`
+	IdStatus      int       `gorm:"column:idstatus;not null" json:"idstatus"`
+	Statusname    string    `gorm:"column:name" json:"statusname"`
+}
+
+type TransactionLog struct {
+	Idtransaction int       `json:"idtransaction"`
+	Seq           int       `json:"seq"`
+	Timestamp     time.Time `json:"timestamp"`
+	UID           string    `json:"uid"`
+	IdStatus      int       `gorm:"column:idstatus" json:"idstatus"`
+	Statusname    string    `gorm:"column:name" json:"statusname"`
+}

@@ -30,7 +30,11 @@ func UsersRoutes(app *fiber.App, gateways HTTPGateway) {
 	users.Get("/cart", gateways.GetCartByUID)
 	users.Put("/cart", gateways.UpdateCartManyByUID)
 	users.Delete("/cart/:product_id", gateways.DeleteCartByUID)
-	users.Get("/crate_transaction", gateways.CreateTransaction)
+	users.Put("/update", gateways.UpdateUser)
+
+	userstranx := app.Group("/user", middlewares.SetJWTHandler())
+	userstranx.Get("/crate_transaction", gateways.CreateTransaction)
+	userstranx.Get("/transaction", gateways.GetTransaction)
 }
 
 func ProductRoutes(app *fiber.App, gateways HTTPGateway) {
@@ -46,4 +50,15 @@ func ProductRoutes(app *fiber.App, gateways HTTPGateway) {
 	productJWT.Post("/", gateways.CreateProduct)
 	productJWT.Put("/:product_id", gateways.UpdateProduct)
 	productJWT.Delete("/:product_id", gateways.DeleteProduct)
+	productJWT.Put("/qty/:product_id", gateways.UpdateQtyProduct)
+}
+
+func AdminRoutes(app *fiber.App, gateways HTTPGateway) {
+	// Admin
+	admin := app.Group("/admin", middlewares.SetJWTHandler())
+	admin.Get("/transaction", gateways.GetAllTransaction)
+	admin.Get("/", gateways.GetAllAdmin)
+	admin.Post("/", gateways.CrateAdmin)
+	admin.Get("/transaction_update", gateways.UpdateStatusTransaction)
+	admin.Get("/transaction_log", gateways.GetAllTransactionLog)
 }

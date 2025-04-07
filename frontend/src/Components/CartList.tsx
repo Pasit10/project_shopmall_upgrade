@@ -37,27 +37,28 @@ const CartList = () => {
       const response = await axiosInstance.put("/user/cart", {
         cart: cartItems
       },{withCredentials:true});
-      if (response.status === 200){
-        setCartItems((prevItems) =>
-          prevItems.filter((item) =>
-            item.is_select === 'F'
-          )
-        )
-      }else if(response.status !== 200) {
+
+      if(response.status !== 200) {
         throw new Error();
       }
       const response2 = await axiosInstance.get("/user/crate_transaction", {
         withCredentials: true
       })
-
-      if(response2.status !== 201) {
+      if (response2.status === 201) {
+        setCartItems((prevItems) =>
+          prevItems.filter((item) =>
+            item.is_select === 'F'
+          )
+        )
+      }else if(response2.status !== 201) {
         throw new Error();
       }
     }catch (error: unknown) {
-      if(error instanceof AxiosError){
-        alert(error.response)
-      }else {
-        alert(error)
+      if (error instanceof AxiosError) {
+        alert(error.response?.data.thai_description);
+        console.error("Login error:", error);
+      } else {
+        alert("An unknown error occurred.");
       }
     }
   };

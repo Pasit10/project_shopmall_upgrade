@@ -1,39 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ShoppingBag, MapPin, Phone, Mail } from "lucide-react";
 import { UserProfile } from "../Types/UserProfile";
-import { PurchaseHistory } from "../Types/PurchaseHistory";
+import { Transaction } from "../Types/PurchaseHistory";
 import axiosInstance from "../utils/axios";
 
-
-const purchaseHistory: PurchaseHistory[] = [
-  {
-    id: "1",
-    productName: "Modern Leather Sofa",
-    price: 45000,
-    purchaseDate: "2024-03-10",
-    image:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-    status: "delivered",
-  },
-  {
-    id: "2",
-    productName: "Minimalist Coffee Table",
-    price: 12000,
-    purchaseDate: "2024-02-25",
-    image:
-      "https://images.unsplash.com/photo-1565374395542-0ce18882c857?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-    status: "shipping",
-  },
-  {
-    id: "3",
-    productName: "Minimalist Coffee Table",
-    price: 12000,
-    purchaseDate: "2024-02-25",
-    image:
-      "https://images.unsplash.com/photo-1565374395542-0ce18882c857?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-    status: "shipping",
-  },
-];
 
 const cardStyle: React.CSSProperties = {
   borderRadius: "20px",
@@ -47,14 +17,15 @@ const iconContainerStyle: React.CSSProperties = {
   padding: "12px",
 };
 
-const badgeStyle: React.CSSProperties = {
-  padding: "0.6rem 1rem",
-  borderRadius: "30px",
-  fontWeight: 500,
-};
+// const badgeStyle: React.CSSProperties = {
+//   padding: "0.6rem 1rem",
+//   borderRadius: "30px",
+//   fontWeight: 500,
+// };
 
 function Profile() {
   const [user, setUser] = useState<UserProfile>();
+  const [purchaseHistory, setPurchaseHistory] = useState<Transaction[]>([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,6 +35,14 @@ function Profile() {
         });
         if (response.status === 200) {
           setUser(response.data);
+        }
+
+        const response2 = await axiosInstance.get("/user/transaction", {
+          withCredentials: true,
+        });
+
+        if (response2.status === 200) {
+          setPurchaseHistory(response2.data);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -76,6 +55,7 @@ function Profile() {
   if (!user) {
     return <div>Loading...</div>;
   }
+
 
   return (
     <div
@@ -150,63 +130,34 @@ function Profile() {
                   </div>
                 </div>
                 <div className="card-body p-4">
-                  {purchaseHistory.map((purchase) => (
-                    <div
-                      key={purchase.id}
-                      className="d-flex align-items-center p-3 mb-3 rounded-3"
-                      style={{ backgroundColor: "#f8f9fa" }}
-                    >
-                      <img
-                        src={purchase.image}
-                        alt={purchase.productName}
-                        className="rounded-3 me-4"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <div className="flex-grow-1">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <h5 className="mb-0 fw-semibold">
-                            {purchase.productName}
-                          </h5>
-                          <span
-                            className={`badge bg-${
-                              purchase.status === "delivered"
-                                ? "success"
-                                : purchase.status === "shipping"
-                                ? "primary"
-                                : "warning"
-                            }`}
-                            style={badgeStyle}
-                          >
-                            {purchase.status === "delivered"
-                              ? "จัดส่งแล้ว"
-                              : purchase.status === "shipping"
-                              ? "กำลังจัดส่ง"
-                              : "กำลังดำเนินการ"}
-                          </span>
-                        </div>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <span className="text-muted">
-                            สั่งซื้อเมื่อ{" "}
-                            {new Date(purchase.purchaseDate).toLocaleDateString(
-                              "th-TH",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
-                          </span>
-                          <span className="h5 mb-0 fw-semibold">
-                            ฿{purchase.price.toLocaleString()}
-                          </span>
-                        </div>
+                {purchaseHistory.map((transaction) => (
+                  <div
+                    key={transaction.idtransaction}
+                    className="d-flex align-items-center p-3 mb-3 rounded-3"
+                    style={{ backgroundColor: "#f8f9fa" }}
+                  >
+                    <div className="flex-grow-1">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <h5 className="mb-0 fw-semibold">
+                          รายการสั่งซื้อ #{transaction.idtransaction}
+                        </h5>
+                      </div>
+                      <div className="mb-2">
+                        <span className="text-muted">
+                          สินค้า: {transaction.transaction_details.reduce((acc, item) => acc + item.qty, 0)} ชิ้น
+                        </span>
+                      </div>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="text-muted">
+                          สั่งซื้อเมื่อ {transaction.timestamp}
+                        </span>
+                        <span className="h5 mb-0 fw-semibold">
+                          ฿{transaction.totalprice.toLocaleString()}
+                        </span>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
                 </div>
               </div>
             </div>

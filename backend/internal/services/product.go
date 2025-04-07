@@ -20,6 +20,7 @@ type IProductService interface {
 	UpdateProduct(product_id int, newproduct entities.Product) error
 	DeleteProduct(product_id int) error
 	GetProductFilter(typeid int, minprice float64, maxprice float64) (*entities.ProductWithFilter, error)
+	UpdateQtyProduct(product_id int, qty int) error
 }
 
 func InitProductService(repo repositories.IProductRepository) IProductService {
@@ -145,4 +146,26 @@ func (ser productService) GetProductFilter(typeid int, minprice float64, maxpric
 		return nil, err
 	}
 	return productfilter, nil
+}
+
+func (ser productService) UpdateQtyProduct(product_id int, qty int) error {
+	if product_id < 0 {
+		return templateError.BadrequestError
+	}
+	if qty < 0 {
+		return templateError.BadrequestError
+	}
+
+	product, err := ser.productRepository.GetProductByID(product_id)
+	if err != nil {
+		return err
+	}
+
+	product.Stockqtyfrontend += int32(qty)
+	product.Stockqtybackend += int32(qty)
+
+	if err := ser.productRepository.UpdateProduct(product_id, *product); err != nil {
+		return err
+	}
+	return nil
 }

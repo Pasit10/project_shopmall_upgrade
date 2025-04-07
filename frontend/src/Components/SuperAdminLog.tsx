@@ -7,21 +7,22 @@ const SuperAdminLog: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axiosInstance
-      .get<AdminActivityLog[]>("/api/admin/logs")
-      .then((response) => {
-        const logsWithDate = response.data.map((log) => ({
-          ...log,
-          timestamp: new Date(log.timestamp),
-        }));
-        setAdminLogs(logsWithDate);
-      })
-      .catch((error) => {
+    const fetchAdminLogs = async () => {
+      try {
+        const response = await axiosInstance.get("/admin/transaction_log");
+        if (response.status === 200) {
+          setAdminLogs(response.data);
+        } else {
+          console.error("Failed to fetch admin logs:", response.statusText);
+        }
+      } catch (error) {
         console.error("Error fetching admin logs:", error);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchAdminLogs();
   }, []);
 
   return (
@@ -40,20 +41,22 @@ const SuperAdminLog: React.FC = () => {
                 <table className="table table-bordered">
                   <thead className="bg-primary text-white">
                     <tr>
-                      <th>Admin ID</th>
-                      <th>Admin Name</th>
+                      <th>TransactionID</th>
+                      <th>No</th>
                       <th>Status</th>
+                      <th>Admin ID</th>
                       <th>Timestamp</th>
                     </tr>
                   </thead>
                   <tbody>
                     {adminLogs.length > 0 ? (
-                      adminLogs.map((log) => (
-                        <tr key={log.id}>
-                          <td>{log.adminId}</td>
-                          <td>{log.adminName}</td>
-                          <td>{log.status}</td>
-                          <td>{log.timestamp.toLocaleString()}</td>
+                      adminLogs.map((log,index) => (
+                        <tr key={index}>
+                          <td>{log.idtransaction}</td>
+                          <td>{log.seq}</td>
+                          <td>{log.statusname}</td>
+                          <td>{log.uid}</td>
+                          <td>{log.timestamp}</td>
                         </tr>
                       ))
                     ) : (

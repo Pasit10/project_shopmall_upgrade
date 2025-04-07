@@ -91,3 +91,30 @@ func (h HTTPGateway) CreateTransaction(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "success"})
 }
+
+func (h HTTPGateway) GetTransaction(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	tranx, err := h.UserService.GetTransaction(uid)
+	if err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.JSON(tranx)
+}
+
+func (h HTTPGateway) UpdateUser(c *fiber.Ctx) error {
+	uid := c.Locals("uid").(string)
+
+	var requestData entities.UpdateUser
+	if err := c.BodyParser(&requestData); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	if err := h.UserService.UpdateUserOnlyFields(uid, requestData); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+	return c.JSON(fiber.Map{"message": "success"})
+}

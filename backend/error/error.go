@@ -116,6 +116,8 @@ var (
 	ProductTypeNotFoundError TemplateError = New("ProductType_not_found")
 	CartNotFoundError        TemplateError = New("Cart_not_found")
 	InsufficientStockError   TemplateError = New("Inufficient_Stock_Error")
+	ForbiddenError           TemplateError = New("Forbidden_Error")
+	TransactionNotFoundError TemplateError = New("Transaction_not_found")
 )
 
 var HttpStatusCodes = map[error]int{
@@ -133,6 +135,8 @@ var HttpStatusCodes = map[error]int{
 	ProductTypeNotFoundError: 404,
 	CartNotFoundError:        404,
 	InsufficientStockError:   400,
+	ForbiddenError:           403,
+	TransactionNotFoundError: 404,
 }
 
 var CodesError = map[error]string{
@@ -144,10 +148,12 @@ var CodesError = map[error]string{
 	WrongUserOrPasswordError: "4011",
 	MissingOrMalformedToken:  "4012",
 	InvalidOrExpiredToken:    "4013",
+	ForbiddenError:           "4030",
 	ProductNotFoundError:     "4040",
 	UsernotfoundError:        "4041",
 	ProductNotFoundError:     "4042",
 	CartNotFoundError:        "4043",
+	TransactionNotFoundError: "4044",
 	InternalServerError:      "5000",
 	DatabaseConnectedError:   "5001",
 }
@@ -167,6 +173,8 @@ var ThaiDescription = map[error]string{
 	ProductTypeNotFoundError: "ไม่พบ product type",
 	CartNotFoundError:        "ไม่พบ cart",
 	InsufficientStockError:   "สินค้ามีไม่เพียงพอต่อคำสั่งซื้อ",
+	ForbiddenError:           "ไม่มีสิทธิ์เข้าถึง",
+	TransactionNotFoundError: "ไม่พบการทำธุรกรรม",
 }
 
 var EnglishDescription = map[error]string{
@@ -184,6 +192,8 @@ var EnglishDescription = map[error]string{
 	ProductTypeNotFoundError: "Product type not found",
 	CartNotFoundError:        "Cart not found",
 	InsufficientStockError:   "Insufficient stock for the requested order",
+	ForbiddenError:           "Forbidden access",
+	TransactionNotFoundError: "Transaction not found",
 }
 
 func GetErrorResponse(err error) (int, HttpErrorResponse) {

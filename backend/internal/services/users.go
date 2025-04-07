@@ -21,6 +21,8 @@ type IUserService interface {
 	UpdateCartManyByUID(uid string, cart_data []entities.Cart) error
 	DeleteCartByUID(uid string, idproduct int) error
 	CreateTransaction(uid string) error
+	GetTransaction(uid string) (*[]entities.Transaction, error)
+	UpdateUserOnlyFields(uid string, data entities.UpdateUser) error
 }
 
 func InitUsersService(repo0 repositories.IUsersRepository, repo1 repositories.IProductRepository, repo2 repositories.ICartRepository, repo3 repositories.ITransactionRepository) IUserService {
@@ -108,10 +110,10 @@ func (ser usersService) UpdateCartManyByUID(uid string, cart_data []entities.Car
 
 		product, err := ser.productRepository.GetProductByID(cart.IDproduct)
 		if err != nil {
-			fmt.Println("t")
 			return err
 		}
 		if cart.Quantity > int(product.Stockqtyfrontend) {
+			fmt.Println("cart.Quantity", cart.Quantity, "product.Stockqtyfrontend", product.Stockqtyfrontend)
 			return templateError.InsufficientStockError
 		}
 
@@ -135,4 +137,23 @@ func (ser usersService) DeleteCartByUID(uid string, idproduct int) error {
 
 func (ser usersService) CreateTransaction(uid string) error {
 	return ser.tranxRepository.CreateTransaction(uid)
+}
+
+func (ser usersService) GetTransaction(uid string) (*[]entities.Transaction, error) {
+	return ser.tranxRepository.GetTransaction(uid)
+}
+
+func (ser usersService) UpdateUserOnlyFields(uid string, data entities.UpdateUser) error {
+	user, err := ser.usersRepository.GetUserData(uid)
+	if err != nil {
+		return err
+	}
+
+	user.Address = data.Address
+	user.Tel = data.Tel
+
+	if err := ser.usersRepository.UpdateUser(uid, *user); err != nil {
+		return err
+	}
+	return nil
 }

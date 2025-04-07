@@ -169,3 +169,32 @@ func (h HTTPGateway) DeleteProduct(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"message": "suceess"})
 }
+
+func (h HTTPGateway) UpdateQtyProduct(c *fiber.Ctx) error {
+	// check role
+	uid := c.Locals("uid").(string)
+	if err := h.AuthService.CheckPermissionAdmin(uid); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	product_id_str := c.Params("product_id")
+	product_id, err := strconv.Atoi(product_id_str)
+	if err != nil {
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+
+	var newqty entities.UpdateQtyProduct
+	if err := c.BodyParser(&newqty); err != nil {
+		httpstatuscode, errorresponse := templateError.GetErrorResponse(templateError.BadrequestError)
+		return c.Status(httpstatuscode).JSON(errorresponse)
+	}
+
+	err = h.ProductService.UpdateQtyProduct(product_id, newqty.Qty)
+	if err != nil {
+		httpStatusCode, errorresponse := templateError.GetErrorResponse(err)
+		return c.Status(httpStatusCode).JSON(errorresponse)
+	}
+	return c.JSON(fiber.Map{"message": "suceess"})
+}

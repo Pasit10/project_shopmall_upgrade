@@ -51,33 +51,39 @@ function AdminProduct() {
         }
       );
 
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === updatedProduct.id ? response.data : product
-        )
-      );
+      if (response.status === 200) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === updatedProduct.id ? updatedProduct : product
+          )
+        );
+      }
     } catch (error) {
       console.error("Error updating product:", error);
     }
   };
 
-  const handleAddStockProductUpdate = async (updatedProduct: Product) => {
+  const handleAddStockProductUpdate = async (product_id: number, newQty: number) => {
+    //productJWT.Put("/qty/:product_id", gateways.UpdateQtyProduct)
     try {
       const response = await axiosInstance.put(
-        `/product/${updatedProduct.id}`,
-        updatedProduct,
+        `/product/qty/${product_id}`,
+        { qty: newQty },
         {
           withCredentials: true,
         }
       );
-
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === updatedProduct.id ? response.data : product
-        )
-      );
+      if (response.status === 200) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === product_id
+              ? { ...product, stock_qty_frontend: product.stock_qty_frontend + newQty, stock_qty_backend: product.stock_qty_backend + newQty }
+              : product
+          )
+        );
+      }
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error("Error updating product stock:", error);
     }
   };
 

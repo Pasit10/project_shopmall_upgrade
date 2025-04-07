@@ -2,7 +2,7 @@ type Admin = {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'super_admin';
+  role: 'admin' | 'superadmin';
 };
 
 export default Admin;

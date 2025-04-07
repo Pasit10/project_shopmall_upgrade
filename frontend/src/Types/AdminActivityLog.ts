@@ -1,7 +1,8 @@
 export default interface AdminActivityLog {
-  id: number;
-  adminId: string;
-  adminName: string;
-  status: string;
-  timestamp: string | Date;
-  }
+  idtransaction: number;
+  seq: number;
+  timestamp: string;
+  uid: string;
+  idstatus: number;
+  statusname: string;
+}

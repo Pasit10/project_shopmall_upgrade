@@ -44,34 +44,26 @@ CREATE TABLE cart(
   FOREIGN KEY (idproduct) REFERENCES products(idproduct)
 );
 
-CREATE TABLE admin(
-    idadmin INT PRIMARY KEY AUTO_INCREMENT,
-    adminname VARCHAR(50),
-    password VARCHAR(256),
-    tel VARCHAR(20)
-);
-
-
 CREATE TABLE transactionstatus (
     idstatus INT,
     name VARCHAR(20),
     PRIMARY KEY (idstatus)
-)
+);
 
 CREATE TABLE transactionLog (
     idtransaction INT NOT NULL,
     seq INT,
     timestamp Timestamp,
     idstatus INT NOT NULL,
-    idadmin INT,
+    uid CHAR(50),
     PRIMARY KEY (idtransaction,seq),
     FOREIGN KEY (idstatus) REFERENCES transactionstatus(idstatus),
-    FOREIGN KEY (idadmin) REFERENCES ADMIN(idadmin)
-)
+    FOREIGN KEY (uid) REFERENCES users(uid)
+);
 
-CREATE TABLE transaction(
+CREATE TABLE transactions (
     idtransaction INT PRIMARY KEY AUTO_INCREMENT,
-    totalprice DECIMAL(8,2),
+    totalprice DECIMAL(10,2),
     timestamp TIMESTAMP,
     vat DECIMAL(10,2),
     uid CHAR(50) NOT NULL,
@@ -83,14 +75,15 @@ CREATE TABLE transaction(
 CREATE TABLE transactiondetail (
     idtransaction INT NOT NULL,
     seq INT NOT NULL,
-    price_novat DECIMAL(8,2),
-    vat DECIMAL(8,2),
+    price_novat DECIMAL(10,2),
+    vat DECIMAL(10,2),
     qty INT,
     idproduct INT NOT NULL,
     PRIMARY KEY (idtransaction, seq),
-    FOREIGN KEY (idtransaction) REFERENCES Transaction(idtransaction),
+    FOREIGN KEY (idtransaction) REFERENCES transactions(idtransaction),
     FOREIGN KEY (idproduct) REFERENCES products(idproduct)
 );
+
 
 -- Create Procedures
 DELIMITER //
@@ -125,7 +118,7 @@ BEGIN
 
     loop1: LOOP
         FETCH cur INTO v_IDProduct, v_Quantity, v_IsSelect;
-        IF done = 1 THEN 
+        IF done = 1 THEN
             LEAVE loop1;
         END IF;
 
@@ -139,7 +132,7 @@ BEGIN
 
     -- Insert into transaction
     SET v_Status = 1;
-    INSERT INTO transaction (totalprice, timestamp, uid, idstatus)
+    INSERT INTO transactions (totalprice, timestamp, uid, idstatus)
     VALUES (v_TotalPrice, NOW(), v_uid, v_Status);
 
     -- Retrieve the last inserted transaction ID
@@ -151,13 +144,13 @@ BEGIN
 
     loop2: LOOP
         FETCH cur INTO v_IDProduct, v_Quantity, v_IsSelect;
-        IF done = 1 THEN 
+        IF done = 1 THEN
             LEAVE loop2;
         END IF;
 
         IF v_IsSelect = 'T' THEN
-            SELECT priceperunit, stockqtyfrontend INTO v_PricePerUnit, v_CurStockQty 
-            FROM products 
+            SELECT priceperunit, stockqtyfrontend INTO v_PricePerUnit, v_CurStockQty
+            FROM products
             WHERE idproduct = v_IDProduct;
 
             -- VAT calculation
@@ -186,10 +179,10 @@ BEGIN
     END LOOP loop2;
 
     -- Update VAT in transaction
-    UPDATE transaction SET vat = ROUND(v_TotalVAT, 2) WHERE idtransaction = v_TransactionID;
+    UPDATE transactions SET vat = ROUND(v_TotalVAT, 2) WHERE idtransaction = v_TransactionID;
 
     -- Log transaction
-    INSERT INTO transactionlog (idtransaction, seq, timestamp, idstatus, idadmin) 
+    INSERT INTO transactionlog (idtransaction, seq, timestamp, idstatus, uid)
     VALUES (v_TransactionID, 1, NOW(), 1, NULL);
 
     -- Clear purchased items from cart
@@ -203,10 +196,10 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE OR REPLACE PROCEDURE UpdateTransactionStatus(
+CREATE PROCEDURE UpdateTransactionStatus(
     IN p_IDTransaction INT,
     IN p_NewIDStatus INT,
-    IN p_IDAdmin INT
+    IN p_IDAdmin CHAR(50)
 )
 BEGIN
     DECLARE done INT DEFAULT 0;
@@ -217,9 +210,9 @@ BEGIN
 
     -- Declare a cursor for fetching product details
     DECLARE cur CURSOR FOR
-        SELECT IDProduct, QTY
-        FROM TransactionDetail
-        WHERE IDTransaction = p_IDTransaction;
+        SELECT idproduct, qty
+        FROM transactiondetail
+        WHERE idtransaction = p_IDTransaction;
 
     -- Continue handler for cursor
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
@@ -228,24 +221,26 @@ BEGIN
     START TRANSACTION;
 
     -- Get the current transaction status
-    SELECT IDStatus INTO old_IDStatus
-    FROM Transaction
-    WHERE IDTransaction = p_IDTransaction;
+    SELECT idstatus INTO old_IDStatus
+    FROM transactions
+    WHERE idtransaction = p_IDTransaction;
 
     -- Validate the status update
-    IF ((p_NewIDStatus = old_IDStatus + 1 OR p_NewIDStatus = old_IDStatus - 1) OR (p_NewIDStatus = 6)) AND p_NewIDStatus <= 6 THEN
+    IF ((p_NewIDStatus = old_IDStatus + 1 OR p_NewIDStatus = old_IDStatus - 1) OR (p_NewIDStatus = 6)) 
+       AND p_NewIDStatus <= 6 THEN
+
         -- Update transaction status
-        UPDATE Transaction
-        SET IDStatus = p_NewIDStatus
-        WHERE IDTransaction = p_IDTransaction;
+        UPDATE transactions
+        SET idstatus = p_NewIDStatus
+        WHERE idtransaction = p_IDTransaction;
 
         -- Insert log entry
-        SELECT IFNULL(MAX(Seq), 0) + 1 INTO new_seq
-        FROM TransactionLog
-        WHERE IDTransaction = p_IDTransaction;
+        SELECT IFNULL(MAX(seq), 0) + 1 INTO new_seq
+        FROM transactionlog
+        WHERE idtransaction = p_IDTransaction;
 
-        INSERT INTO TransactionLog (
-            IDTransaction, Seq, Timestamp, IDStatus, IDAdmin
+        INSERT INTO transactionlog (
+            idtransaction, seq, timestamp, idstatus, uid
         )
         VALUES (
             p_IDTransaction, new_seq, NOW(), p_NewIDStatus, p_IDAdmin
@@ -256,8 +251,6 @@ BEGIN
             OPEN cur;
             stock_update_loop: LOOP
                 FETCH cur INTO v_IDProduct, v_QTY;
-
-                -- Exit loop when no rows are left
                 IF done THEN
                     LEAVE stock_update_loop;
                 END IF;
@@ -265,12 +258,12 @@ BEGIN
                 -- Update stock quantities
                 IF p_NewIDStatus = 5 THEN
                     UPDATE products
-                    SET StockQtyBackEnd = StockQtyBackEnd - v_QTY
-                    WHERE IDProduct = v_IDProduct;
+                    SET stockqtybackend = stockqtybackend - v_QTY
+                    WHERE idproduct = v_IDProduct;
                 ELSEIF p_NewIDStatus = 6 THEN
                     UPDATE products
-                    SET StockQtyFrontEnd = StockQtyFrontEnd + v_QTY
-                    WHERE IDProduct = v_IDProduct;
+                    SET stockqtyfrontend = stockqtyfrontend + v_QTY
+                    WHERE idproduct = v_IDProduct;
                 END IF;
             END LOOP;
             CLOSE cur;
@@ -283,10 +276,10 @@ END//
 
 DELIMITER ;
 
+
 INSERT INTO transactionstatus VALUES
 (1,"ยังไม่รับออเดอร์"),(2,"รับออเดอร์"),(3,"เริ่มแพคเกจ"),(4,"ส่งแพคเกจแล้ว"),(5,"ส่งให้ขนส่ง"),(6,"ยกเลิกออเดอร์")
 
-INSERT INTO admin VALUES (1,"admin","admin","09215485");
 
 -- Insert product types
 INSERT INTO producttype (typename) VALUES
@@ -308,3 +301,4 @@ INSERT INTO products (productname, priceperunit, costperunit, detail, stockqtyfr
   ('Office Chair', 3200.00, 2500.00, 'Ergonomic office chair with adjustable height', 15, 60, NULL, 4),
   ('Outdoor Swing', 7000.00, 5000.00, 'Outdoor swing for garden and patio', 3, 15, NULL, 5),
   ('Wall Clock', 1200.00, 800.00, 'Decorative wall clock with wooden frame', 20, 100, NULL, 6);
+

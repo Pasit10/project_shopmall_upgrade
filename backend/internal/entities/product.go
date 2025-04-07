@@ -50,3 +50,7 @@ type ProductWithFilter struct {
 	Maxprice float64   `json:"max_price"`
 	Product  []Product `json:"product"`
 }
+
+type UpdateQtyProduct struct {
+	Qty int `json:"qty"`
+}

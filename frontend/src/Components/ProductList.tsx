@@ -30,13 +30,16 @@ const ProductList = ({ products, handleAddToCart }: ProductListProps) => {
                 </p>
                 <div className="mt-auto">
                   <button
-                    className="btn btn-primary w-100"
+                    className={`btn w-100 ${product.stock_qty_frontend > 0 ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={(e) => {
                       e.preventDefault(); // ป้องกัน Link ทำงานเมื่อกดปุ่ม
-                      handleAddToCart(product);
+                      if (product.stock_qty_frontend > 0) {
+                        handleAddToCart(product);
+                      }
                     }}
+                    disabled={product.stock_qty_frontend <= 0}
                   >
-                    🛒 Add to cart
+                    {product.stock_qty_frontend > 0 ? '🛒 Add to cart' : 'Out of Stock'}
                   </button>
                 </div>
               </div>

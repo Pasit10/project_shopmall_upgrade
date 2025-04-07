@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Edit, Trash2, UserPlus } from 'lucide-react';
 import Admin from '../Types/Admin';
 import axiosInstance from "../utils/axios";
+import axios from 'axios';
 
 const AdminManagement: React.FC = () => {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
-  const [formData, setFormData] = useState<{ email: string; role: 'admin' | 'super_admin' }>({
+  const [formData, setFormData] = useState<{ email: string; role: 'admin' | 'superadmin' }>({
     email: '',
     role: 'admin',
   });
@@ -18,7 +19,7 @@ const AdminManagement: React.FC = () => {
 
   const fetchAdmins = async () => {
     try {
-      const res = await axiosInstance.get<Admin[]>('/admins');
+      const res = await axiosInstance.get<Admin[]>('/admin');
       setAdmins(res.data);
     } catch (err) {
       console.error('Failed to fetch admins', err);
@@ -27,22 +28,33 @@ const AdminManagement: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      if (editingAdmin) {
-        await axiosInstance.put(`/admins/${editingAdmin.id}`, formData);
-      } else {
-        await axiosInstance.post('/admins', formData);
+      const response = await axiosInstance.post('/admin', {
+        email: formData.email,
+        role: formData.role,
+      }, {withCredentials: true});
+      if (response.status === 200) {
+        alert('Admin added successfully');
       }
       fetchAdmins();
       resetModal();
-    } catch (err) {
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        alert(err.response?.data.english_description || 'Error occurred');
+      }
       console.error('Error saving admin', err);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (email: string) => {
     if (window.confirm('Are you sure you want to delete this admin?')) {
       try {
-        await axiosInstance.delete(`/admins/${id}`);
+        const response = await axiosInstance.post('/admin', {
+          email: email,
+          role: 'user',
+        }, {withCredentials: true});
+        if (response.status === 200) {
+          alert('Admin delete successfully');
+        }
         fetchAdmins();
       } catch (err) {
         console.error('Failed to delete admin', err);
@@ -94,7 +106,7 @@ const AdminManagement: React.FC = () => {
                 <td>{admin.name}</td>
                 <td>{admin.email}</td>
                 <td>
-                  <span className={`badge bg-${admin.role === 'super_admin' ? 'danger' : 'primary'}`}>
+                  <span className={`badge bg-${admin.role === 'superadmin' ? 'danger' : 'primary'}`}>
                     {admin.role}
                   </span>
                 </td>
@@ -108,7 +120,7 @@ const AdminManagement: React.FC = () => {
                     </button>
                     <button
                       className="btn btn-outline-danger btn-sm"
-                      onClick={() => handleDelete(admin.id)}
+                      onClick={() => handleDelete(admin.email)}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -149,11 +161,11 @@ const AdminManagement: React.FC = () => {
                         className="form-select"
                         value={formData.role}
                         onChange={(e) =>
-                          setFormData({ ...formData, role: e.target.value as 'admin' | 'super_admin' })
+                          setFormData({ ...formData, role: e.target.value as 'admin' | 'superadmin' })
                         }
                       >
                         <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
+                        <option value="superadmin">Super Admin</option>
                       </select>
                     </div>
                   </form>

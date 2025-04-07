@@ -26,3 +26,13 @@ type UserData struct {
 	Role      string `json:"role"`
 	Logintype string `json:"login_type"`
 }
+
+type CreateAdmin struct {
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}
+
+type UpdateUser struct {
+	Address string `json:"address"`
+	Tel     string `json:"tel"`
+}

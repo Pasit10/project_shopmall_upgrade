@@ -20,6 +20,7 @@ type IAuthService interface {
 	Register(userData entities.UserAuth) (err error)
 	LoginWithGoogle(uid string, userData entities.UserAuth) (user *entities.UserAuth, err error)
 	GetUserByUID(uid string) (user *entities.UserAuth, err error)
+	CheckPermissionSuperAdmin(uid string) error
 }
 
 func InitAuthenService(repo repositories.IAuthRepository) IAuthService {
@@ -34,8 +35,21 @@ func (ser authService) CheckPermissionAdmin(uid string) error {
 		return err
 	}
 
-	if !(user.Role == "admin" || user.Role == "super admin") {
-		return templateError.UnauthorizedError
+	if !(user.Role == "admin" || user.Role == "superadmin") {
+		return templateError.ForbiddenError
+	}
+
+	return nil
+}
+
+func (ser authService) CheckPermissionSuperAdmin(uid string) error {
+	user, err := ser.AuthRepository.GetUserByUID(uid)
+	if err != nil {
+		return err
+	}
+
+	if !(user.Role == "superadmin") {
+		return templateError.ForbiddenError
 	}
 
 	return nil

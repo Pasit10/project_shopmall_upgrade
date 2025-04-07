@@ -20,21 +20,15 @@ const AddProductPopup: React.FC<AddStockProductPopupProps> = ({
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // แยกค่า stock สำหรับ frontend และ backend
-    const parsedData = {
-      ...formData,
-      stock_qty_frontend: Number(formData.stock_qty_frontend),  // เก็บค่า stock สำหรับ frontend
-      stock_qty_backend: Number(formData.stock_qty_backend),    // เก็บค่า stock สำหรับ backend
-    };
-
-    console.log("🚀 Submitting Add Product Stock with data:", parsedData);
-    await onSubmit(parsedData);
+    // Get the product ID from formData
+    const productId = formData.id;
+    // Convert stock_qty_frontend to a number
+    const newQuantity = Number(formData.stock_qty_frontend);
+    // Send only product ID and quantity to the parent component
+    await onSubmit(productId, newQuantity);
   };
-
   return (
     <div
       className="modal fade"
@@ -56,23 +50,12 @@ const AddProductPopup: React.FC<AddStockProductPopupProps> = ({
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label className="form-label">Stock Quantity (Frontend)</label>
+                <label className="form-label">Stock Quantity</label>
                 <input
                   type="number"
                   className="form-control"
                   name="stock_qty_frontend"
                   value={formData.stock_qty_frontend}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Stock Quantity (Backend)</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  name="stock_qty_backend"
-                  value={formData.stock_qty_backend}
                   onChange={handleChange}
                   required
                 />

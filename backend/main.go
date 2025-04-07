@@ -56,8 +56,9 @@ func main() {
 	authService := ser.InitAuthenService(authRepo)
 	produteService := ser.InitProductService(productRepo)
 	usersService := ser.InitUsersService(usersRepo, productRepo, cartRepo, tranxRepo)
+	adminService := ser.InitAdminService(tranxRepo, usersRepo)
 
-	gateways.InitHTTPGateway(app, authService, produteService, usersService)
+	gateways.InitHTTPGateway(app, authService, produteService, usersService, adminService)
 
 	PORT := os.Getenv("SERVER_PORT")
 	if PORT == "" {
