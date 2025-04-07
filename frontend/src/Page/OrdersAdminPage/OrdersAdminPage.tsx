@@ -84,6 +84,12 @@ function OrdersAdminPage() {
                             <th className="border-0">Customer</th>
                             <th className="border-0">Date</th>
                             <th className="border-0">Status</th>
+                            <th
+                              className="border-0 text-center"
+                              style={{ width: "200px" }}
+                            >
+                              Action
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -107,6 +113,19 @@ function OrdersAdminPage() {
                                 >
                                   {order.status}{" "}
                                 </span>
+                              </td>
+                              <td className="text-center">
+                                <div className="d-flex justify-content-center gap-2">
+                                  <button className="btn btn-sm btn-success">
+                                    Accept
+                                  </button>
+                                  <button className="btn btn-sm btn-danger">
+                                    Reject
+                                  </button>
+                                  <button className="btn btn-sm btn-secondary">
+                                    Cancel
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))}{" "}
