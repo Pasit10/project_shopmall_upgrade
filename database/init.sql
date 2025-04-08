@@ -295,10 +295,10 @@ UPDATE producttype SET typeimg = 'asd';
 
 -- Insert products
 INSERT INTO products (productname, priceperunit, costperunit, detail, stockqtyfrontend, stockqtybackend, productimage, typeid) VALUES
-  ('Sofa Set', 15000.00, 12000.00, 'Comfortable 3-seat sofa set', 10, 50, NULL, 1),
-  ('Queen Bed', 12000.00, 9000.00, 'Modern queen-size bed', 8, 40, NULL, 2),
-  ('Dining Table', 8500.00, 6000.00, 'Wooden dining table for 6 people', 5, 20, NULL, 3),
-  ('Office Chair', 3200.00, 2500.00, 'Ergonomic office chair with adjustable height', 15, 60, NULL, 4),
-  ('Outdoor Swing', 7000.00, 5000.00, 'Outdoor swing for garden and patio', 3, 15, NULL, 5),
-  ('Wall Clock', 1200.00, 800.00, 'Decorative wall clock with wooden frame', 20, 100, NULL, 6);
+  ('Sofa Set', 15000.00, 12000.00, 'Comfortable 3-seat sofa set', 10, 50, 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80', 1),
+  ('Queen Bed', 12000.00, 9000.00, 'Modern queen-size bed', 8, 40, 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1172&q=80', 2),
+  ('Dining Table', 8500.00, 6000.00, 'Wooden dining table for 6 people', 5, 20, 'https://images.unsplash.com/photo-1615874959474-d609969a20ed?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80', 3),
+  ('Office Chair', 3200.00, 2500.00, 'Ergonomic office chair with adjustable height', 15, 60, 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80', 4),
+  ('Outdoor Swing', 7000.00, 5000.00, 'Outdoor swing for garden and patio', 3, 15, 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80', 5),
+  ('Wall Clock', 1200.00, 800.00, 'Decorative wall clock with wooden frame', 20, 100, 'https://images.unsplash.com/photo-1600210492493-0946911123ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80', 6);
 
