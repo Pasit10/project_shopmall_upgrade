@@ -77,7 +77,7 @@ func (repo transactionRepository) GetTransactionById(idtransaction int) (*entiti
 	}
 
 	var result entities.Transaction
-	if err := repo.DB.Table("Transactions").Where("idtransaction = ?", idtransaction).First(&result).Error; err != nil {
+	if err := repo.DB.Table("transactions").Where("idtransaction = ?", idtransaction).First(&result).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, templateError.TransactionNotFoundError
 		}

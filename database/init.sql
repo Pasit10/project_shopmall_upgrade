@@ -50,7 +50,7 @@ CREATE TABLE transactionstatus (
     PRIMARY KEY (idstatus)
 );
 
-CREATE TABLE transactionLog (
+CREATE TABLE transactionlog (
     idtransaction INT NOT NULL,
     seq INT,
     timestamp Timestamp,
@@ -278,7 +278,7 @@ DELIMITER ;
 
 
 INSERT INTO transactionstatus VALUES
-(1,"ยังไม่รับออเดอร์"),(2,"รับออเดอร์"),(3,"เริ่มแพคเกจ"),(4,"ส่งแพคเกจแล้ว"),(5,"ส่งให้ขนส่ง"),(6,"ยกเลิกออเดอร์")
+(1,"ยังไม่รับออเดอร์"),(2,"รับออเดอร์"),(3,"เริ่มแพคเกจ"),(4,"ส่งแพคเกจแล้ว"),(5,"ส่งให้ขนส่ง"),(6,"ยกเลิกออเดอร์");
 
 
 -- Insert product types
@@ -291,7 +291,7 @@ INSERT INTO producttype (typename) VALUES
   ('Decor');
 
 -- Update product type images
-UPDATE producttype SET typeimg = 'asd';
+-- UPDATE producttype SET typeimg = 'asd';
 
 -- Insert products
 INSERT INTO products (productname, priceperunit, costperunit, detail, stockqtyfrontend, stockqtybackend, productimage, typeid) VALUES

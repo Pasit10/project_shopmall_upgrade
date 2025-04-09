@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/mail"
+	"regexp"
 )
 
 type authService struct {
@@ -98,6 +99,10 @@ func (ser authService) Register(userData entities.UserAuth) (err error) {
 	if userData.Password == "" {
 		return templateError.BadrequestError
 	}
+	if !validatePassword(userData.Password) {
+		return templateError.BadrequestError
+	}
+
 	_, err = ser.AuthRepository.GetUser(userData.Email)
 	if !errors.Is(err, templateError.UsernotfoundError) {
 		return templateError.EmailAlreadyExistError
@@ -141,4 +146,33 @@ func (ser authService) GetUserByUID(uid string) (user *entities.UserAuth, err er
 		return nil, err
 	}
 	return
+}
+
+func validatePassword(password string) bool {
+	// ความยาวขั้นต่ำ
+	if len(password) < 8 {
+		return false
+	}
+
+	// มีตัวพิมพ์เล็กอย่างน้อย 1 ตัว
+	hasLowercase, _ := regexp.MatchString(`[a-z]`, password)
+	if !hasLowercase {
+		return false
+	}
+
+	// มีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว
+	hasUppercase, _ := regexp.MatchString(`[A-Z]`, password)
+	if !hasUppercase {
+		return false
+	}
+
+	// มีตัวเลขอย่างน้อย 1 ตัว
+	hasNumber, _ := regexp.MatchString(`[0-9]`, password)
+	if !hasNumber {
+		return false
+	}
+
+	// มีสัญลักษณ์อย่างน้อย 1 ตัว
+	hasSymbol, _ := regexp.MatchString(`[!@#\$%\^&\*\(\)_\+\-=\[\]{};':"\\|,.<>\/?]+`, password)
+	return hasSymbol
 }

@@ -16,7 +16,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-
 let isRefreshing = false;
 let refreshPromise: Promise<AxiosResponse> | null = null;
 

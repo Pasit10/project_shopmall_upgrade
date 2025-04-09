@@ -16,3 +16,6 @@ backend/server.*
 #docker
 docker-compose.yml
 noteDocker.txt
+cloud-docker-compose.yml
+test.txt
+nginx-proxy/nginx.txt

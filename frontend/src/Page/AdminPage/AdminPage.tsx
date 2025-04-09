@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Line } from "react-chartjs-2";
 import useStats from "../../hooks/useStat";
 import Sidebar from "../../Components/Sidebar";
@@ -14,8 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../utils/axios";
+
 
 ChartJS.register(
   CategoryScale,
@@ -43,29 +42,6 @@ const salesData = {
 function AdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const stats = useStats();
-
-  const navigate = useNavigate();
-
-  const fetchUser = useCallback(async () => {
-    try {
-      const response = await axiosInstance.get("/user/me", {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        const { role } = response.data;
-        if (role !== "admin" && role !== "superadmin") {
-          navigate("/");
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      navigate("/");
-    }
-  }, [navigate]); // Added navigate as a dependency
-
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
 
   return (
     <div className="min-vh-100 d-flex">

@@ -26,6 +26,7 @@ function AdminProduct() {
     }
   };
 
+
   useEffect(() => {
     fetchProducts();
   }, []);

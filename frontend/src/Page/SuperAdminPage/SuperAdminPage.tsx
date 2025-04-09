@@ -14,9 +14,11 @@ function SuperAdminPage() {
         const response = await axiosInstance.get("/user/me", { withCredentials: true });
         if (response.status === 200) {
             const { role } = response.data;
-            if (role !== "admin" && role !== "superadmin") {
+            if (role !== "superadmin") {
                 navigate("/");
             }
+        }else if(response.data === 401){
+          navigate("/");
         }
     } catch (error) {
         console.error("Error fetching user:", error);

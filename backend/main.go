@@ -28,7 +28,7 @@ func main() {
 	app.Use(middlewares.NewLogger())
 	// app.Use(cors.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000, http://localhost:5173, http://localhost:8080",
+		AllowOrigins:     "http://localhost:3000, http://localhost:5173, http://localhost, https://modernofurniture.xyz/",
 		AllowCredentials: true,
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowHeaders:     "Content-Type, Authorization",

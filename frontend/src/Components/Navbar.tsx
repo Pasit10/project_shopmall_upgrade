@@ -34,8 +34,7 @@ const Navbar = () => {
             setIsSuperAdminBtnOpen(true);
         }
         setUser(response.data);
-        console.log("User data:", response.data.address);
-        
+
         // Check if address or tel is empty and show modal
         if (response.data.address === "" || response.data.tel === "") {
           setModalData({
@@ -44,7 +43,7 @@ const Navbar = () => {
           });
           setShowAddressModal(true);
         }
-        
+
         isUserfetched.current = true;
       }
     } catch (error) {

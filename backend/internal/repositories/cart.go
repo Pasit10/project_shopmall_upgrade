@@ -33,7 +33,7 @@ func (repo cartRepository) GetCartByUID(uid string) (*[]entities.CartResponse, e
 
 	var result []entities.CartResponse
 	if err := repo.DB.Table("cart").Select("cart.idproduct,productname,priceperunit,quantity,isselect,stockqtyfrontend").
-		Joins("INNER JOIN Products ON Products.idproduct = cart.idproduct").
+		Joins("INNER JOIN products ON products.idproduct = cart.idproduct").
 		Where("uid = ?", uid).Find(&result).Error; err != nil {
 		return nil, err
 	}

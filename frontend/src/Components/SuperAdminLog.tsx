@@ -2,6 +2,25 @@ import React, { useEffect, useState } from "react";
 import type AdminActivityLog from "../Types/AdminActivityLog";
 import axiosInstance from "../utils/axios";
 
+const getStatusBadgeClass = (statusName: string): string => {
+  switch (statusName.toLowerCase()) {
+    case "ยังไม่รับออเดอร์":
+      return "bg-warning text-dark";
+    case "รับออเดอร์":
+      return "bg-info text-white";
+    case "เริ่มแพคเกจ":
+      return "bg-primary text-white";
+    case "ส่งแพคเกจแล้ว":
+      return "bg-info text-white";
+    case "ส่งให้ขนส่ง":
+      return "bg-success text-white";
+    case "ยกเลิกออเดอร์":
+      return "bg-danger text-white";
+    default:
+      return "bg-secondary text-white";
+  }
+};
+
 const SuperAdminLog: React.FC = () => {
   const [adminLogs, setAdminLogs] = useState<AdminActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,14 +57,14 @@ const SuperAdminLog: React.FC = () => {
               <p>Loading logs...</p>
             ) : (
               <div className="table-responsive">
-                <table className="table table-bordered">
+                <table className="table table-bordered centered-table text-center align-middle">
                   <thead className="bg-primary text-white">
                     <tr>
-                      <th>TransactionID</th>
-                      <th>No</th>
-                      <th>Status</th>
-                      <th>Admin ID</th>
-                      <th>Timestamp</th>
+                      <th className="border-0">TransactionID</th>
+                      <th className="border-0">No</th>
+                      <th className="border-0">Status</th>
+                      <th className="border-0">Admin ID</th>
+                      <th className="border-0">Timestamp</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -54,7 +73,15 @@ const SuperAdminLog: React.FC = () => {
                         <tr key={index}>
                           <td>{log.idtransaction}</td>
                           <td>{log.seq}</td>
-                          <td>{log.statusname}</td>
+                          <td>
+                            <span
+                              className={`badge rounded-pill ${getStatusBadgeClass(
+                                log.statusname
+                              )}`}
+                            >
+                              {log.statusname}
+                            </span>
+                          </td>
                           <td>{log.uid}</td>
                           <td>{log.timestamp}</td>
                         </tr>

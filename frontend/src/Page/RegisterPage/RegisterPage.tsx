@@ -5,6 +5,7 @@ import validator from "validator";
 import axiosInstant from "../../utils/axios";
 import { Lock, Mail, LogIn, UserPlus , Phone , MapPin , Users} from "lucide-react";
 import { GoogleLogin , CredentialResponse } from "@react-oauth/google";
+import { AxiosError } from "axios";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -48,9 +49,13 @@ const RegisterPage = () => {
       } else {
         setError("Registration failed. Please try again.");
       }
-    } catch (error) {
-      setError("Network error. Please try again later.");
-      console.error("Registration error:", error);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        setError(error.response?.data.english_description);
+        console.error("Login error:", error);
+      } else {
+        setError("An unknown error occurred.");
+      }
     }
   };
 

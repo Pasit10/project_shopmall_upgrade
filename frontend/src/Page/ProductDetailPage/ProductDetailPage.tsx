@@ -8,7 +8,7 @@ function ProductDetailPage() {
    <div className="d-flex flex-column min-vh-100">
     <Navbar/>
       <div className="flex-grow-1">
-        <ProductDetail /> 
+        <ProductDetail />
       </div>
       <Footer />
     </div>

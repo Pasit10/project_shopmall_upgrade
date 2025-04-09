@@ -14,9 +14,21 @@ import ProfilePage from "./Page/ProfilePage/ProfilePage";
 import SuperAdminPage from "./Page/SuperAdminPage/SuperAdminPage";
 import SuperAdminLogPage from "./Page/SuperAdminLogPage/SuperAdminLogPage";
 import DashboardSuperAdminPage from "./Page/DashboardSuperAdminPage/DashboardSuperAdminPage";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 
-function App() {
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+};
+
+const AppRoutes = () => {
+  const { currentUser } = useAuth(); // ดึงข้อมูล currentUser จาก AuthContext
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -24,18 +36,56 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/shop" element={<ProductPage />} />
-      <Route path="/admin" element={<AdminPage />} />
-      <Route path="/homeadmin" element={<AdminHomePage/>} />
-      <Route path="/admin/product" element={<AdminProductPage/>} />
-      <Route path="/admin/orders" element={<OrdersAdminPage/>} />
-      <Route path="/cart" element={<CartList/>} />
+      <Route path="/cart" element={<CartList />} />
       <Route path="/product/:product_id" element={<ProductDetailPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/superadmin/manageadmin" element={<SuperAdminPage />} />
-      <Route path="/superadmin/log" element={<SuperAdminLogPage />} />
-      <Route path="/superadmin" element={<DashboardSuperAdminPage />} />
+
+      {/* 🔒 Requires login */}
+      <Route path="/profile" element={
+        <ProtectedRoute currentUser={currentUser}>
+          <ProfilePage />
+        </ProtectedRoute>
+      } />
+
+      {/* 🔒 Admin only */}
+      <Route path="/admin" element={
+        <ProtectedRoute role="admin" currentUser={currentUser}>
+          <AdminPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/homeadmin" element={
+        <ProtectedRoute role="admin" currentUser={currentUser}>
+          <AdminHomePage />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/product" element={
+        <ProtectedRoute role="admin" currentUser={currentUser}>
+          <AdminProductPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/orders" element={
+        <ProtectedRoute role="admin" currentUser={currentUser}>
+          <OrdersAdminPage />
+        </ProtectedRoute>
+      } />
+
+      {/* 🔒 Superadmin only */}
+      <Route path="/superadmin" element={
+        <ProtectedRoute role="superadmin" currentUser={currentUser}>
+          <DashboardSuperAdminPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/superadmin/manageadmin" element={
+        <ProtectedRoute role="superadmin" currentUser={currentUser}>
+          <SuperAdminPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/superadmin/log" element={
+        <ProtectedRoute role="superadmin" currentUser={currentUser}>
+          <SuperAdminLogPage />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
-}
+};
 
 export default App;

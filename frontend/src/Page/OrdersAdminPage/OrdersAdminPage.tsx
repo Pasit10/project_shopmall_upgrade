@@ -5,6 +5,7 @@ import { Package2 } from "lucide-react";
 import axios from "axios";
 import axiosInstance from "../../utils/axios";
 import Transaction from "../../Types/Transaction";
+import { useNavigate } from "react-router-dom";
 
 // Array of statuses
 const statusList: string[] = [
@@ -41,6 +42,7 @@ function OrdersAdminPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -63,8 +65,10 @@ function OrdersAdminPage() {
       }
     };
 
+
     fetchTransactions();
-  }, []);
+  }, [navigate]);
+
 
   const handleUpdateTransaction = async (transactionId: number, newstatus: number) => {
     try {

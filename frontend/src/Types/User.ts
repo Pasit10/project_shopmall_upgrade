@@ -1,6 +1,5 @@
 interface User {
     name: string;
-    email?: string; // Optional fields
+    email?: string;
 }
-
 export default User

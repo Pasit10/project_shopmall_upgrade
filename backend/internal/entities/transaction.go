@@ -5,15 +5,13 @@ import (
 )
 
 type Transaction struct {
-	IdTransaction int       `gorm:"column:idtransaction;primaryKey;autoIncrement" json:"idtransaction"`
-	TotalPrice    float64   `gorm:"column:totalprice" json:"totalprice"`
-	Timestamp     time.Time `gorm:"column:timestamp" json:"timestamp"`
-	VAT           float64   `gorm:"column:vat" json:"vat"`
-	UID           string    `gorm:"column:uid;size:50;not null" json:"uid"`
-	IdStatus      int       `gorm:"column:idstatus;not null" json:"idstatus"`
-
-	// GORM will automatically detect the foreign key relationship
-	TransactionDetails []TransactionDetail `gorm:"foreignKey:IdTransaction" json:"transaction_details"`
+	IdTransaction      int                 `gorm:"column:idtransaction;primaryKey;autoIncrement" json:"idtransaction"`
+	TotalPrice         float64             `gorm:"column:totalprice" json:"totalprice"`
+	Timestamp          time.Time           `gorm:"column:timestamp" json:"timestamp"`
+	VAT                float64             `gorm:"column:vat" json:"vat"`
+	UID                string              `gorm:"column:uid;size:50;not null" json:"uid"`
+	IdStatus           int                 `gorm:"column:idstatus;not null" json:"idstatus"`
+	TransactionDetails []TransactionDetail `gorm:"foreignKey:IdTransaction;references:IdTransaction" json:"transaction_details"`
 }
 
 func (Transaction) TableName() string {

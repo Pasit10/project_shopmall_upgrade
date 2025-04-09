@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import axiosInstant from "../../utils/axios";
-// import {axios} from 'axios'
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Lock, Mail, LogIn, UserPlus } from "lucide-react";
 import { AxiosError } from "axios";
@@ -17,12 +16,12 @@ const LoginPage = () => {
   const handleEmailLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
-  
+
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
-  
+
     try {
       const response = await axiosInstant.post(
         "/login",
@@ -31,8 +30,6 @@ const LoginPage = () => {
       );
 
       if (response.status === 200) {
-        
-        console.log("Login successful:", response.data);
         navigate("/");
       } else {
         setError("Invalid email or password.");
@@ -46,27 +43,13 @@ const LoginPage = () => {
       }
     }
   };
-  
 
-  const handleGoogleLoginSuccess = async (
-    credentialResponse: CredentialResponse
-  ) => {
+  const handleGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
     try {
-      // const response = await fetch("http://10.42.14.139:3000/auth/google", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ token: credentialResponse.credential }),
-      // });
-      const { credential } = credentialResponse
-
-      const response = await axiosInstant.post("/google/login", { token: credential }, { withCredentials:true})
-
-      // const data = await response.json();
+      const { credential } = credentialResponse;
+      const response = await axiosInstant.post("/google/login", { token: credential }, { withCredentials: true });
 
       if (response.status === 200) {
-        // console.log("Google Login successful", data);
         navigate("/");
       } else {
         setError(response.data || "Google Login failed.");
