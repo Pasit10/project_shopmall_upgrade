@@ -20,7 +20,6 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// AuthProvider ครอบ App
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axiosInstant.get("/user/me", {
         withCredentials: true,
       });
+      console.log("API call successful:", response.data);
       setCurrentUser(response.data);
     } catch (error) {
       console.error("❌ Failed to fetch user profile:", error);

@@ -10,6 +10,8 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, role, currentUser }) => {
+  // const navigate = useNavigate
+
   console.log("user is",currentUser)
   if (!currentUser) {
     return <Navigate to="/login" replace />;

@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 const API_HOST = import.meta.env.VITE_API_HOST;
 
@@ -8,52 +8,52 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  (request) => {
-    return request;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (request) => request,
+  (error) => Promise.reject(error)
 );
 
 let isRefreshing = false;
-let refreshPromise: Promise<AxiosResponse> | null = null;
+let refreshPromise: Promise<void> | null = null;
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-    // ไม่ต้องยิงซ้ำหากเป็น /login, /google/login หรือ /register
+    console.error("Axios error:", error.response);
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       const skipRetryEndpoints = ["/login", "/google/login", "/register"];
-      if (originalRequest.url && skipRetryEndpoints.includes(new URL(originalRequest.url, window.location.origin).pathname)) {
-        return Promise.reject(error);
+      const requestUrl = new URL(originalRequest.url!, window.location.origin).pathname;
+
+      if (skipRetryEndpoints.includes(requestUrl)) {
+        return Promise.reject(error); // Don't retry for auth-related endpoints
       }
 
       originalRequest._retry = true;
 
       if (!isRefreshing) {
         isRefreshing = true;
-        refreshPromise = axiosInstance.get("/token/refresh", { withCredentials: true })
-          .then((res) => {
+        refreshPromise = axios
+          .get(`${API_HOST}/token/refresh`, { withCredentials: true })
+          .then(() => {
             isRefreshing = false;
             refreshPromise = null;
-            return res;
           })
           .catch((refreshError) => {
             isRefreshing = false;
             refreshPromise = null;
-            window.location.href = "/login"; // Redirect to login if refresh fails
-            return Promise.reject(refreshError);
+            console.error("Token refresh failed:", refreshError);
+            throw refreshError;
           });
       }
 
       try {
         await refreshPromise;
-        return axiosInstance(originalRequest); // Retry the original request
+        return axiosInstance(originalRequest); // Retry original request
       } catch (refreshError) {
-        return Promise.reject(refreshError); // Reject if refresh fails
+        console.error("Error after token refresh attempt:", refreshError);
+        return Promise.reject(refreshError);
       }
     }
 

@@ -104,9 +104,9 @@ func (repo transactionRepository) GetAllTransactionLog() (*[]entities.Transactio
 	}
 
 	var result []entities.TransactionLog
-	if err := repo.DB.Table("transactionLog").
+	if err := repo.DB.Table("transactionlog").
 		Select("idtransaction", "seq", "timestamp", "uid", "transactionstatus.idstatus", "transactionstatus.name").
-		Joins("INNER JOIN transactionstatus ON transactionLog.idstatus = transactionstatus.idstatus").
+		Joins("INNER JOIN transactionstatus ON transactionlog.idstatus = transactionstatus.idstatus").
 		Order("idtransaction, seq").
 		Find(&result).Error; err != nil {
 		return nil, err

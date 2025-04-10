@@ -7,21 +7,19 @@ import (
 	ser "backend/internal/services"
 	"backend/middlewares"
 	"backend/pkg/database"
-	"fmt"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	// ----- remove before deploy ------ //
-	err := godotenv.Load(".env.test")
-	if err != nil {
-		fmt.Println("err load ENV")
-		os.Exit(1)
-	}
+	// err := godotenv.Load(".env.test")
+	// if err != nil {
+	// 	fmt.Println("err load ENV")
+	// 	os.Exit(1)
+	// }
 	// --------------------------------- //
 
 	app := fiber.New(configuration.NewConfiguraiton())

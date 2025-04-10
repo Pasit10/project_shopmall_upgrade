@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES6", // หรือ ESNext, เลือกตามความเหมาะสม
+    "target": "ES2022",
     "lib": ["ES2023"],
-    "module": "esnext",  // เปลี่ยนจาก "commonjs" เป็น "esnext"
+    "module": "ESNext",
     "skipLibCheck": true,
 
     /* Bundler mode */
